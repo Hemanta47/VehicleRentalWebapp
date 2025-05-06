@@ -1,0 +1,186 @@
+package com.FleetX.service;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.FleetX.config.DbConfig;
+import com.FleetX.model.UserModel;
+import com.FleetX.util.PasswordUtil;
+
+public class UserService {
+	private Connection dbConnection;
+
+	public UserService() {
+		try {
+			this.dbConnection = DbConfig.getDbConnection();
+		} catch (SQLException | ClassNotFoundException ex) {
+			System.err.println("Database Connection error: " + ex.getMessage());
+			ex.printStackTrace();
+		}
+	}
+
+	public List<UserModel> getAllUser() {
+	    String role = "customer";
+	    List<UserModel> usersList = new ArrayList<>();
+	    String sqlString = "SELECT * FROM users WHERE role = ?";
+
+	    try (PreparedStatement pst = dbConnection.prepareStatement(sqlString)) {
+	        pst.setString(1, role);
+	        ResultSet resultSet = pst.executeQuery();
+
+	        while (resultSet.next()) {
+	            usersList.add(addUserDetail(resultSet));
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace(); // Better than empty catch
+	    }
+
+	    return usersList;
+	}
+
+	public UserModel addUserDetail(ResultSet rs) {
+	    UserModel userModel = new UserModel();
+
+	    try {
+	        userModel.setId(rs.getInt("UserID"));
+	        userModel.setFname(rs.getString("FirstName"));
+	        userModel.setLname(rs.getString("LastName"));
+	        userModel.setuName(rs.getString("UserName"));
+	        userModel.setDob(rs.getString("DOB"));
+	        userModel.setPhone(rs.getString("Number"));
+	        userModel.setPassword(rs.getString("Password"));
+	        userModel.setEmail(rs.getString("Email"));
+	        userModel.setRole(rs.getString("role"));
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+
+	    return userModel;
+	}
+
+
+	public UserModel getUserByUsername(String username) {
+		UserModel user = null;
+		String sqlString = "SELECT * FROM users WHERE Username = ?";
+
+		try (PreparedStatement pst = dbConnection.prepareStatement(sqlString)) {
+			pst.setString(1, username);
+			ResultSet rSet = pst.executeQuery();
+
+			if (rSet.next()) {
+				user = new UserModel();
+				user.setFname(rSet.getString("FirstName"));
+				user.setLname(rSet.getString("LastName"));
+				user.setuName(rSet.getString("UserName"));
+				user.setPhone(rSet.getString("Number"));
+				user.setEmail(rSet.getString("Email"));
+				user.setPassword(rSet.getString("Password"));
+			}
+		} catch (SQLException e) {
+			System.err.println("Error fetching user: " + e.getMessage());
+		}
+
+		return user;
+	}
+
+	public boolean updateUserProfile(UserModel user) {
+		String sql = "UPDATE users SET FirstName=?, LastName=?, Email=?, Number=? WHERE UserName=?";
+
+		try (PreparedStatement pst = dbConnection.prepareStatement(sql)) {
+			pst.setString(1, user.getFname());
+			pst.setString(2, user.getLname());
+			pst.setString(3, user.getEmail());
+			pst.setString(4, user.getPhone());
+			pst.setString(5, user.getuName()); // WHERE clause
+
+			int rows = pst.executeUpdate();
+			return rows > 0;
+		} catch (Exception e) {
+			System.err.println("Error updating profile: " + e.getMessage());
+			return false;
+		}
+	}
+
+	public boolean updateUserPassword(String uName, String oldPassword, String newPassword) {
+		String sqlSelect = "SELECT Password FROM users WHERE UserName = ?";
+		String sqlUpdate = "UPDATE users SET Password = ? WHERE UserName = ?";
+
+		try (PreparedStatement pst = dbConnection.prepareStatement(sqlSelect);
+				PreparedStatement pstUpdate = dbConnection.prepareStatement(sqlUpdate)) {
+
+			pst.setString(1, uName);
+			ResultSet rSet = pst.executeQuery();
+
+			if (rSet.next()) {
+				String regPasswordString = rSet.getString("Password");
+				String decrypted = PasswordUtil.decrypt(regPasswordString, uName);
+
+				if (decrypted == null || !oldPassword.equals(decrypted)) {
+					return false;
+				}
+			} else {
+				return false;
+			}
+
+			String newHashPassword = PasswordUtil.encrypt(uName, newPassword);
+			pstUpdate.setString(1, newHashPassword);
+			pstUpdate.setString(2, uName);
+
+			int rows = pstUpdate.executeUpdate();
+			return rows > 0;
+
+		} catch (SQLException e) {
+			System.err.println("Error updating password: " + e.getMessage());
+			return false;
+		}
+	}
+
+	public String getUsernameByEmail(String email) throws SQLException {
+		String sql = "SELECT Username FROM users WHERE Email = ?";
+		try (PreparedStatement pst = dbConnection.prepareStatement(sql)) {
+			pst.setString(1, email);
+			try (ResultSet rs = pst.executeQuery()) {
+				if (rs.next()) {
+					return rs.getString("Username");
+				} else {
+					return null;
+				}
+			}
+		} catch (SQLException e) {
+			System.err.println("Error retrieving username by email: " + e.getMessage());
+			throw e;
+		}
+	}
+
+	public boolean updateUserPasswordByEmail(String email, String encryptedPassword) {
+		String sql = "UPDATE users SET Password = ? WHERE Email = ?";
+		try (PreparedStatement pst = dbConnection.prepareStatement(sql)) {
+			pst.setString(1, encryptedPassword);
+			pst.setString(2, email);
+			int rows = pst.executeUpdate();
+			return rows > 0;
+		} catch (SQLException e) {
+			System.err.println("Error updating password: " + e.getMessage());
+			return false;
+		}
+	}
+	
+	
+	public boolean deleteUser(int userId) {
+        String query = "DELETE FROM users WHERE UserID = ?";
+        try (PreparedStatement stmt = dbConnection.prepareStatement(query)) {
+            stmt.setInt(1, userId);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+}
