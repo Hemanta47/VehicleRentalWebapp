@@ -121,42 +121,55 @@ input[type="submit"]:hover {
 	text-align: center;
 }
 
-
-#toggleIcon {
+#toggleIcon, #toggleIcon1, #toggleIcon2 {
 	position: absolute;
-  bottom: 53.5%;
-  transform: translate(-50%,-50%);
-  right: 0;
-  cursor: pointer;
+	bottom: 53%;
+	transform: translate(-50%, -50%);
+	right: 0;
+	cursor: pointer;
+	color: #000;
+	right: 4%;
+}
+
+#toggleIcon1{
+	bottom: 55%;
+}
+
+#toggleIcon2{
+	bottom: 29%;
 }
 
 .modal {
-  display: none;
-  position: fixed;
-  z-index: 100;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: var(--gray-700);
-  color: var(--black);
+	display: none;
+	position: fixed;
+	z-index: 100;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background-color: var(--gray-700);
+	color: var(--black);
 }
 
 .modal-content {
-  background-color: #fff;
-  margin: 10% auto;
-  padding: 20px;
-  width: 90%;
-  max-width: 400px;
-  border-radius: 8px;
-  position: relative;
+	background-color: #fff;
+	margin: 10% auto;
+	padding: 20px;
+	width: 90%;
+	max-width: 400px;
+	border-radius: 8px;
+	position: relative;
+}
+
+.modal-content h3{
+	margin-bottom: 2rem;
 }
 
 .modal-content .close {
-  position: absolute;
-  right: 15px;
-  top: 10px;
-  font-size: 24px;
-  cursor: pointer;
+	position: absolute;
+	right: 15px;
+	top: 10px;
+	font-size: 24px;
+	cursor: pointer;
 }

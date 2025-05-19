@@ -1,4 +1,4 @@
-package com.FleetX.controller;
+package com.FleetX.controller.admin;
 
 import java.io.IOException;
 

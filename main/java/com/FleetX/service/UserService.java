@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.FleetX.config.DbConfig;
+import com.FleetX.model.RentalModel;
 import com.FleetX.model.UserModel;
 import com.FleetX.util.PasswordUtil;
 
@@ -23,46 +24,61 @@ public class UserService {
 		}
 	}
 
+	public int getUserIdByUsername(String username) {
+		int userId = 0;
+		String sqlString = "SELECT UserID from users WHERE username = ?";
+		try (PreparedStatement pst = dbConnection.prepareStatement(sqlString)) {
+			pst.setString(1, username);
+			ResultSet resultSet = pst.executeQuery();
+			if (resultSet.next()) {
+				userId = resultSet.getInt("UserId");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return userId;
+
+	}
+
 	public List<UserModel> getAllUser() {
-	    String role = "customer";
-	    List<UserModel> usersList = new ArrayList<>();
-	    String sqlString = "SELECT * FROM users WHERE role = ?";
+		String role = "customer";
+		List<UserModel> usersList = new ArrayList<>();
+		String sqlString = "SELECT * FROM users WHERE role = ? ORDER BY UserID DESC";
 
-	    try (PreparedStatement pst = dbConnection.prepareStatement(sqlString)) {
-	        pst.setString(1, role);
-	        ResultSet resultSet = pst.executeQuery();
+		try (PreparedStatement pst = dbConnection.prepareStatement(sqlString)) {
+			pst.setString(1, role);
+			ResultSet resultSet = pst.executeQuery();
 
-	        while (resultSet.next()) {
-	            usersList.add(addUserDetail(resultSet));
-	        }
+			while (resultSet.next()) {
+				usersList.add(addUserDetail(resultSet));
+			}
 
-	    } catch (Exception e) {
-	        e.printStackTrace(); // Better than empty catch
-	    }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-	    return usersList;
+		return usersList;
 	}
 
 	public UserModel addUserDetail(ResultSet rs) {
-	    UserModel userModel = new UserModel();
+		UserModel userModel = new UserModel();
 
-	    try {
-	        userModel.setId(rs.getInt("UserID"));
-	        userModel.setFname(rs.getString("FirstName"));
-	        userModel.setLname(rs.getString("LastName"));
-	        userModel.setuName(rs.getString("UserName"));
-	        userModel.setDob(rs.getString("DOB"));
-	        userModel.setPhone(rs.getString("Number"));
-	        userModel.setPassword(rs.getString("Password"));
-	        userModel.setEmail(rs.getString("Email"));
-	        userModel.setRole(rs.getString("role"));
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    }
+		try {
+			userModel.setId(rs.getInt("UserID"));
+			userModel.setFname(rs.getString("FirstName"));
+			userModel.setLname(rs.getString("LastName"));
+			userModel.setuName(rs.getString("UserName"));
+			userModel.setDob(rs.getString("DOB"));
+			userModel.setPhone(rs.getString("Number"));
+			userModel.setPassword(rs.getString("Password"));
+			userModel.setEmail(rs.getString("Email"));
+			userModel.setRole(rs.getString("role"));
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
-	    return userModel;
+		return userModel;
 	}
-
 
 	public UserModel getUserByUsername(String username) {
 		UserModel user = null;
@@ -169,18 +185,91 @@ public class UserService {
 			return false;
 		}
 	}
-	
-	
+
 	public boolean deleteUser(int userId) {
-        String query = "DELETE FROM users WHERE UserID = ?";
-        try (PreparedStatement stmt = dbConnection.prepareStatement(query)) {
-            stmt.setInt(1, userId);
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
+		String query = "DELETE FROM users WHERE UserID = ?";
+		try (PreparedStatement stmt = dbConnection.prepareStatement(query)) {
+			stmt.setInt(1, userId);
+			int rowsAffected = stmt.executeUpdate();
+			return rowsAffected > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public List<RentalModel> getRentalData(String username) {
+		List<RentalModel> rentList = new ArrayList<>();
+		String sqlString = """
+				    SELECT
+				        r.rental_id,
+				        v.model,
+				        p.amount AS amount,
+				        r.status
+				    FROM rental r
+				    JOIN vehicle v ON r.vehicle_id = v.id
+				    LEFT JOIN payment p ON r.rental_id = p.rental_id
+				    JOIN users u ON r.user_id = u.userID
+				    WHERE u.UserName = ?
+				""";
+
+		try (PreparedStatement pStatement = dbConnection.prepareStatement(sqlString)) {
+			pStatement.setString(1, username);
+			ResultSet rs = pStatement.executeQuery();
+
+			while (rs.next()) {
+				System.out.println("Row found:");
+				System.out.println("Rental ID: " + rs.getInt("rental_id"));
+				System.out.println("Model: " + rs.getString("model"));
+				System.out.println("Amount: " + rs.getDouble("amount"));
+				System.out.println("Status: " + rs.getString("status"));
+				RentalModel rentalModel = new RentalModel(rs.getInt("rental_id"), rs.getString("status"),
+						rs.getDouble("amount"), rs.getString("model"));
+				rentList.add(rentalModel);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		System.out.println("Total rentals fetched: " + rentList.size());
+		return rentList;
+	}
+
+	public int totalUserCount() {
+		int count = 0;
+		String sqlString = "SELECT COUNT(*) FROM users";
+		try {
+			PreparedStatement pStatement = dbConnection.prepareStatement(sqlString);
+			ResultSet rs = pStatement.executeQuery();
+			if (rs.next()) {
+				count = rs.getInt(1);
+			}
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+		}
+		return count;
+	}
+
+	public List<UserModel> getOnly5User() {
+		String role = "customer";
+		List<UserModel> usersList = new ArrayList<>();
+		String sqlString = "SELECT * FROM users WHERE role = ? ORDER BY UserID DESC LIMIT 5";
+
+		try (PreparedStatement pst = dbConnection.prepareStatement(sqlString)) {
+			pst.setString(1, role);
+			ResultSet resultSet = pst.executeQuery();
+
+			while (resultSet.next()) {
+				usersList.add(addUserDetail(resultSet));
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return usersList;
+	}
 
 }

@@ -1,4 +1,4 @@
-package com.FleetX.controller;
+package com.FleetX.controller.user;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -37,8 +37,8 @@ public class UpdatePasswordController extends HttpServlet {
         HttpSession session = request.getSession();
 
         if (success) {
-            request.setAttribute("passwordStatus", "success"); // used to show popup
-            session.setAttribute("passwordUpdatedAt", new Date()); // timestamp
+            request.setAttribute("passwordStatus", "success"); 
+            session.setAttribute("passwordUpdatedAt", new Date());
         } else {
             request.setAttribute("error", "Failed to update password. Check old password.");
         }

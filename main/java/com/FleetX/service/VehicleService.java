@@ -18,51 +18,45 @@ public class VehicleService {
 			ex.printStackTrace();
 		}
 	}
-	
-	
+
 	public boolean insertVehicle(VehicleModel vehicle) {
-	    String sql = "INSERT INTO vehicle (" +
-	            "category, brand, model, year, registration_number, " +
-	            "daily_rate, fuel_type, transmission, capacity, status, " +
-	            "image_url, location, description, features" +
-	            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO vehicle (" + "category, brand, model, year, registration_number, "
+				+ "daily_rate, fuel_type, transmission, capacity, status, "
+				+ "image_url, location, description, features" + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-	    try (PreparedStatement stmt = dbConnection.prepareStatement(sql)) {
+		try (PreparedStatement stmt = dbConnection.prepareStatement(sql)) {
 
-	        stmt.setString(1, vehicle.getCategory());
-	        stmt.setString(2, vehicle.getBrand());
-	        stmt.setString(3, vehicle.getModel());
-	        stmt.setInt(4, vehicle.getYear());
-	        stmt.setString(5, vehicle.getRegistrationNumber());
-	        stmt.setBigDecimal(6, vehicle.getDailyRate());
-	        stmt.setString(7, vehicle.getFuelType());
-	        stmt.setString(8, vehicle.getTransmission());
-	        stmt.setInt(9, vehicle.getCapacity());
-	        stmt.setString(10, vehicle.getStatus());
-	        stmt.setString(11, vehicle.getImageUrl());
-	        stmt.setString(12, vehicle.getLocation());
-	        stmt.setString(13, vehicle.getDescription());
-	        stmt.setString(14, vehicle.getFeatures());
+			stmt.setString(1, vehicle.getCategory());
+			stmt.setString(2, vehicle.getBrand());
+			stmt.setString(3, vehicle.getModel());
+			stmt.setInt(4, vehicle.getYear());
+			stmt.setString(5, vehicle.getRegistrationNumber());
+			stmt.setBigDecimal(6, vehicle.getDailyRate());
+			stmt.setString(7, vehicle.getFuelType());
+			stmt.setString(8, vehicle.getTransmission());
+			stmt.setInt(9, vehicle.getCapacity());
+			stmt.setString(10, vehicle.getStatus());
+			stmt.setString(11, vehicle.getImageUrl());
+			stmt.setString(12, vehicle.getLocation());
+			stmt.setString(13, vehicle.getDescription());
+			stmt.setString(14, vehicle.getFeatures());
 
-	        int rowsAffected = stmt.executeUpdate();
-	        return rowsAffected > 0;
+			int rowsAffected = stmt.executeUpdate();
+			return rowsAffected > 0;
 
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        return false;
-	    }
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
-	
-	
 	// Get all vehicles
 	public List<VehicleModel> getAllVehicles() {
-		
-		List<VehicleModel> vehicles = new ArrayList<>();
-		String sql = "SELECT * FROM vehicle";
 
-		try (PreparedStatement stmt = dbConnection.prepareStatement(sql);
-		     ResultSet rs = stmt.executeQuery()) {
+		List<VehicleModel> vehicles = new ArrayList<>();
+		String sql = "SELECT * FROM vehicle ORDER BY id DESC";
+
+		try (PreparedStatement stmt = dbConnection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 			while (rs.next()) {
 				vehicles.add(setVehicleResult(rs));
 			}
@@ -70,62 +64,61 @@ public class VehicleService {
 			e.printStackTrace();
 		}
 		return vehicles;
-	} 
-	
-	//Filtering Vehicle
-	public List<VehicleModel> getFilteredVehicles(String fuel, String gear, String type, String location) {
-	    List<VehicleModel> vehicles = new ArrayList<>();
-	    StringBuilder sql = new StringBuilder("SELECT * FROM vehicle WHERE 1=1");
-	    List<Object> params = new ArrayList<>();
-
-	    if (fuel != null && !fuel.isEmpty()) {
-	        sql.append(" AND fuel_type = ?");
-	        params.add(fuel);
-	    }
-	    if (gear != null && !gear.isEmpty()) {
-	        sql.append(" AND transmission = ?");
-	        params.add(gear);
-	    }
-	    if (type != null && !type.isEmpty()) {
-	        sql.append(" AND category = ?");
-	        params.add(type);
-	    }
-	    if (location != null && !location.isEmpty()) {
-	        sql.append(" AND location = ?");
-	        params.add(location);
-	    }
-
-	    try (PreparedStatement stmt = dbConnection.prepareStatement(sql.toString())) {
-	        for (int i = 0; i < params.size(); i++) {
-	            stmt.setObject(i + 1, params.get(i));
-	        }
-
-	        try (ResultSet rs = stmt.executeQuery()) {
-	            while (rs.next()) {
-	                vehicles.add(setVehicleResult(rs));
-	            }
-	        }
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    }
-
-	    return vehicles;
 	}
 
-	
+	// Filtering Vehicle
+	public List<VehicleModel> getFilteredVehicles(String fuel, String gear, String type, String location) {
+		List<VehicleModel> vehicles = new ArrayList<>();
+		StringBuilder sql = new StringBuilder("SELECT * FROM vehicle WHERE 1=1");
+		List<Object> params = new ArrayList<>();
+
+		if (fuel != null && !fuel.isEmpty()) {
+			sql.append(" AND fuel_type = ?");
+			params.add(fuel);
+		}
+		if (gear != null && !gear.isEmpty()) {
+			sql.append(" AND transmission = ?");
+			params.add(gear);
+		}
+		if (type != null && !type.isEmpty()) {
+			sql.append(" AND category = ?");
+			params.add(type);
+		}
+		if (location != null && !location.isEmpty()) {
+			sql.append(" AND location = ?");
+			params.add(location);
+		}
+
+		try (PreparedStatement stmt = dbConnection.prepareStatement(sql.toString())) {
+			for (int i = 0; i < params.size(); i++) {
+				stmt.setObject(i + 1, params.get(i));
+			}
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					vehicles.add(setVehicleResult(rs));
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return vehicles;
+	}
+
 	public VehicleModel getVehicleById(int id) {
-	    VehicleModel vehicle = null;
-	    String sql = "SELECT * FROM vehicle WHERE id = ?";
-	    try (PreparedStatement stmt = dbConnection.prepareStatement(sql)) {
-	        stmt.setInt(1, id);
-	        ResultSet rs = stmt.executeQuery();
-	        if (rs.next()) {
-	            vehicle = setVehicleResult(rs); // use your helper
-	        }
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    }
-	    return vehicle;
+		VehicleModel vehicle = null;
+		String sql = "SELECT * FROM vehicle WHERE id = ?";
+		try (PreparedStatement stmt = dbConnection.prepareStatement(sql)) {
+			stmt.setInt(1, id);
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next()) {
+				vehicle = setVehicleResult(rs); // use your helper
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return vehicle;
 	}
 
 	public VehicleModel setVehicleResult(ResultSet rs) throws SQLException {
@@ -147,24 +140,17 @@ public class VehicleService {
 		v.setFeatures(rs.getString("features"));
 		return v;
 	}
-	
-		public List<VehicleModel> getNewAddedVehicle(){
-		List<VehicleModel> vehicles = new ArrayList<>();
-		String sql = "SELECT * FROM vehicle ORDER BY id DESC LIMIT 4";
 
-		try (PreparedStatement stmt = dbConnection.prepareStatement(sql);
-		     ResultSet rs = stmt.executeQuery()) {
+	public List<VehicleModel> getNewAddedVehicle() {
+		List<VehicleModel> vehicles = new ArrayList<>();
+		String sql = "SELECT * FROM vehicle WHERE status='available' ORDER BY id DESC LIMIT 4";
+
+		try (PreparedStatement stmt = dbConnection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 			while (rs.next()) {
-				vehicles.add(new VehicleModel(
-						rs.getInt("id"),
-						rs.getString("brand"),
-						rs.getString("model"),
-						rs.getBigDecimal("daily_rate"),
-						rs.getString("transmission"),
-						rs.getInt("capacity"),
-						rs.getString("image_url")
-						));
-				
+				vehicles.add(new VehicleModel(rs.getInt("id"), rs.getString("brand"), rs.getString("model"),
+						rs.getBigDecimal("daily_rate"), rs.getString("transmission"), rs.getInt("capacity"),
+						rs.getString("image_url")));
+
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -172,4 +158,104 @@ public class VehicleService {
 		return vehicles;
 
 	}
+
+	public boolean updateVehicle(VehicleModel vehicle) {
+		String sql = "UPDATE vehicle SET category=?, brand=?, model=?, year=?, registration_number=?, "
+				+ "daily_rate=?, fuel_type=?, transmission=?, capacity=?, status=?, image_url=?, "
+				+ "location=?, description=?, features=? WHERE id=?";
+
+		try (PreparedStatement stmt = dbConnection.prepareStatement(sql)) {
+
+			stmt.setString(1, vehicle.getCategory());
+			stmt.setString(2, vehicle.getBrand());
+			stmt.setString(3, vehicle.getModel());
+			stmt.setInt(4, vehicle.getYear());
+			stmt.setString(5, vehicle.getRegistrationNumber());
+			stmt.setBigDecimal(6, vehicle.getDailyRate());
+			stmt.setString(7, vehicle.getFuelType());
+			stmt.setString(8, vehicle.getTransmission());
+			stmt.setInt(9, vehicle.getCapacity());
+			stmt.setString(10, vehicle.getStatus());
+			stmt.setString(11, vehicle.getImageUrl());
+			stmt.setString(12, vehicle.getLocation());
+			stmt.setString(13, vehicle.getDescription());
+			stmt.setString(14, vehicle.getFeatures());
+			stmt.setInt(15, vehicle.getId());
+
+			int affectedRows = stmt.executeUpdate();
+			return affectedRows > 0;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.err.println("Error updating profile: " + e.getMessage());
+			return false;
+		}
+	}
+
+	public boolean deleteVehicle(int vehicleId) {
+		String query = "DELETE FROM vehicle WHERE id = ?";
+		try (PreparedStatement stmt = dbConnection.prepareStatement(query)) {
+			stmt.setInt(1, vehicleId);
+			int rowsAffected = stmt.executeUpdate();
+			return rowsAffected > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public void updateVehicleAvailabilityBasedOnRentals() {
+		String updateRentalSql = """
+				    UPDATE rental
+				    SET status = 'completed'
+				    WHERE end_date <= CURRENT_DATE AND status = 'booked'
+				""";
+
+		String updateVehicleSql = """
+				    UPDATE vehicle
+				    SET status = 'available', location = (
+				        SELECT r.dropLocation
+				        FROM rental r
+				        WHERE r.vehicle_id = vehicle.id
+				          AND r.end_date <= CURRENT_DATE
+				          AND r.status = 'completed'
+				        ORDER BY r.end_date DESC
+				        LIMIT 1
+				    )
+				    WHERE id IN (
+				        SELECT vehicle_id
+				        FROM rental
+				        WHERE end_date <= CURRENT_DATE AND status = 'completed'
+				    )
+				""";
+
+		try (PreparedStatement ps1 = dbConnection.prepareStatement(updateRentalSql);
+				PreparedStatement ps2 = dbConnection.prepareStatement(updateVehicleSql)) {
+			int rentalUpdated = ps1.executeUpdate();
+			int vehicleUpdated = ps2.executeUpdate();
+
+			System.out.println(" Updated " + rentalUpdated + " rental(s) to 'completed'.");
+			System.out.println(" Updated " + vehicleUpdated + " vehicle(s) to 'available' and updated their location.");
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public int totalVehicleCount() {
+		int count = 0;
+		String sqlString = "SELECT COUNT(*) FROM vehicle";
+		try {
+			PreparedStatement pStatement = dbConnection.prepareStatement(sqlString);
+			ResultSet rs = pStatement.executeQuery();
+			if (rs.next()) {
+				count = rs.getInt(1);
+			}
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+		}
+		return count;
+	}
+
 }

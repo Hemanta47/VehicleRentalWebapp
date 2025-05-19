@@ -55,8 +55,11 @@ public class CartService {
     }
 
     public void clearCart() {
+        System.out.println("Clearing cart...");
         session.removeAttribute(CART_SESSION_KEY);
+        System.out.println("Cart after clearing: " + session.getAttribute(CART_SESSION_KEY));
     }
+
 
     public BigDecimal calculateTotalPrice() {
         List<CartModel> cart = getCartItems();

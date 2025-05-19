@@ -1,4 +1,4 @@
-package com.FleetX.controller;
+package com.FleetX.controller.vehicle;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -38,6 +38,7 @@ public class AddToCartController extends HttpServlet {
         Date startDate = Date.valueOf(request.getParameter("startDate"));
         Date endDate = Date.valueOf(request.getParameter("endDate"));
         String pickupLocation = request.getParameter("pickupLocation");
+        String dropupLocation = request.getParameter("dropupLocation");
         
         VehicleModel vehicle = vehicleService.getVehicleById(vehicleId);
         if (vehicle == null) {
@@ -53,7 +54,8 @@ public class AddToCartController extends HttpServlet {
         	    vehicle.getDailyRate(),
         	    startDate,
         	    endDate,
-        	    pickupLocation);
+        	    pickupLocation,
+        	    dropupLocation);
         
         HttpSession session = request.getSession();
         CartService service = new CartService(session);

@@ -29,6 +29,7 @@ public class HomeController extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+	    vehicleService.updateVehicleAvailabilityBasedOnRentals();
 		request.setAttribute("VehicleList", vehicleService.getNewAddedVehicle());
 		request.getRequestDispatcher("/WEB-INF/Pages/home.jsp").forward(request, response);
 	}

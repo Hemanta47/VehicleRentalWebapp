@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="${contextPath}/css/global.css" />
 <link rel="stylesheet" href="${contextPath}/css/vehicle.css" />
 <link rel="stylesheet" href="${contextPath}/css/header.css" />
+<link rel="stylesheet" href="${contextPath}/css/footer.css" />
 </head>
 <body>
 	<jsp:include page="./component/header.jsp" />
@@ -24,13 +25,12 @@
 		<div class="vehicle-content">
 			<!-- Display Success Message when Added to Cart -->
 			<c:if test="${not empty sessionScope.cartMessage}">
-				<div class="alert" style="padding: 10px;
-    color: #ff0000;
-    border: 1px solid #c3e6cb;
-    border-radius: 5px;
-    margin-bottom: 1rem;
-    font-size: 2rem;">${sessionScope.cartMessage}</div>
+				<div class="alert" id="cartMessage" style="">${sessionScope.cartMessage}</div>
 				<c:remove var="cartMessage" scope="session" />
+			</c:if>
+
+			<c:if test="${not empty requestScope.message}">
+				<div class="alert" id="message">${requestScope.message}</div>
 			</c:if>
 
 			<section class="one">
@@ -108,10 +108,21 @@
 									<p>
 										<i class="fa-solid fa-person"></i> ${vehicle.capacity}
 									</p>
-								</div>
-								<div class="rent-btn">
-									<a href="${contextPath}/vehicleDetail?vehicleId=${vehicle.id}">RentNow</a>
-								</div>
+								</div> <c:choose>
+									<c:when test="${vehicle.status.toLowerCase() == 'available'}">
+										<div class="rent-btn">
+											<a
+												href="${contextPath}/vehicleDetail?vehicleId=${vehicle.id}">Rent
+												Now</a>
+										</div>
+									</c:when>
+									<c:otherwise>
+										<div class="not-available-box">
+											<span class="not-available">Not Available</span>
+										</div>
+									</c:otherwise>
+								</c:choose>
+
 							</li>
 						</c:forEach>
 					</c:if>
@@ -122,5 +133,18 @@
 			</section>
 		</div>
 	</div>
+
+	<jsp:include page="./component/footer.jsp" />
 </body>
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const alert = document.getElementById('cartMessage')|| document.getElementById('message');
+    if (alert) {
+      setTimeout(() => {
+        alert.classList.add('hide');
+      }, 4000);
+    }
+  });
+</script>
+
 </html>

@@ -14,7 +14,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f4f4f4;
+            background-color: #2d2b2b;
         }
         .container {
             max-width: 900px;
@@ -22,55 +22,47 @@
             background: white;
             padding: 30px;
             border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
         }
         h1, h2 {
             color: #333;
             text-align: center;
             margin-bottom: 30px;
         }
-        .checkout-summary ul {
-            list-style: none;
-            padding: 0;
+        .order-table table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
         }
-        .checkout-summary li {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
+        .order-table th, .order-table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
         }
-        .checkout-summary img {
+        .order-table th {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .order-table img {
             width: 90px;
             height: auto;
             border-radius: 4px;
-            margin-right: 15px;
-        }
-        .checkout-summary .item-info {
-            flex-grow: 1;
-        }
-        .checkout-summary .item-info div:first-child {
-            font-weight: bold;
-            font-size: 18px;
-        }
-        .checkout-summary .item-info div:last-child {
-            color: #666;
         }
         .cart-total {
             display: flex;
             justify-content: space-between;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             padding: 15px 0;
-            border-top: 1px solid #eee;
-            border-bottom: 1px solid #eee;
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
             margin-bottom: 20px;
         }
         .submit-btn {
             display: block;
             width: 100%;
             padding: 15px;
-            background: #2ecc71;
+            background: #018f48;
             color: white;
             border: none;
             border-radius: 5px;
@@ -78,15 +70,16 @@
             cursor: pointer;
         }
         .submit-btn:hover {
-            background: #27ae60;
+            background: #488561;
         }
         .back-btn {
             display: block;
             text-align: center;
             margin-top: 20px;
-            color: #3498db;
+            color: #2d2d2b;
             text-decoration: none;
             font-size: 16px;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -97,26 +90,47 @@
     <div class="checkout-summary">
         <h2>Order Summary</h2>
         <c:if test="${not empty cartItems}">
-            <ul>
-                <c:forEach var="item" items="${cartItems}">
-                    <li>
-                        <img src="${contextPath}/assets/vehicle/${item.imageUrl}" alt="${item.model}" />
-                        <div class="item-info">
-                            <div>${item.model}</div>
-                            <div>Rs. ${item.dailyRate}/day</div>
-                        </div>
-                    </li>
-                </c:forEach>
-            </ul>
+            <div class="order-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Vehicle Name</th>
+                            <th>Rental Day</th>
+                            <th>Per Day Rate (Rs.)</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach var="item" items="${cartItems}">
+                            <tr>
+                                <td><img src="${contextPath}/assets/vehicle/${item.imageUrl}" alt="${item.model}" /></td>
+                                <td>${item.model}</td>
+                                <td>${item.rentalDays}</td>
+                                <td>${item.dailyRate}</td>
+                                <td>${item.dailyRate * item.rentalDays}</td>
+                            </tr>
+                        </c:forEach>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="4">Total</th>
+                            <td>Rs. <%= request.getAttribute("totalValue") %></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
         </c:if>
 
         <div class="cart-total">
-            <span>Total Amount:</span>
-            <span>Rs. <%= request.getAttribute("totalValue") %></span>
+            <div>
+                <span>Total Amount:</span>
+                <span>Rs. <%= request.getAttribute("totalValue") %></span>
+            </div>
         </div>
     </div>
 
-    <form action="ProcessOrder" method="post">
+    <form action="ProcessOrder" method="POST">
         <button type="submit" class="submit-btn">Place Order</button>
     </form>
 

@@ -1,4 +1,4 @@
-package com.FleetX.controller;
+package com.FleetX.controller.vehicle;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -25,10 +25,9 @@ public class VehicleController extends HttpServlet {
 	    String gear = request.getParameter("gear");
 	    String type = request.getParameter("type");
 	    String location = request.getParameter("location");
-
+	    
 	    // Call a new service method that handles filtering
 	    request.setAttribute("vehicleList", vehicleService.getFilteredVehicles(fuel, gear, type, location));
-
 	    request.getRequestDispatcher("/WEB-INF/Pages/vehicle.jsp").forward(request, response);
 	}
 

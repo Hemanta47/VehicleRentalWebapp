@@ -36,48 +36,51 @@
 				<div class="row">
 					<div class="field-group">
 						<label for="fname">First Name</label> <input type="text"
-							id="fname" name="fname" placeholder="e.g., John" required />
+							id="fname" name="fname" value="${fname}" placeholder="e.g., John" />
 					</div>
 					<div class="field-group">
 						<label for="lname">Last Name</label> <input type="text" id="lname"
-							name="lname" placeholder="e.g., Doe" required />
+							name="lname" value="${lname}" placeholder="e.g., Doe" />
 					</div>
 				</div>
 
 				<div class="row">
 					<div class="field-group">
 						<label for="username">Username</label> <input type="text"
-							id="username" name="username" placeholder="e.g., John123"
-							required />
+							id="username" name="username" value="${username}"
+							placeholder="e.g., John123" />
 					</div>
 					<div class="field-group">
 						<label for="dob">Date of Birth</label> <input type="date" id="dob"
-							name="dob" required />
+							name="dob" value="${dob}" />
 					</div>
 				</div>
 
 				<div class="row">
 					<div class="field-group">
 						<label for="email">Email</label> <input type="email" id="email"
-							name="email" placeholder="e.g., john123@gmail.com" required />
+							name="email" value="${email}"
+							placeholder="e.g., john123@gmail.com" />
 					</div>
 					<div class="field-group">
-						<label for="phone">Phone</label> <input type="tel" id="phone"
-							name="phone" placeholder="e.g., 98********" required />
+						<label for="phone">Phone</label> <input type="tel" id="phone" name="phone" value="${phone}"
+					placeholder="e.g., 98********" />
 					</div>
 				</div>
 
 				<div class="row">
 					<div class="field-group">
 						<label for="password">Password</label> <input type="password"
-							id="password" name="password" placeholder="Create password"
-							required /> <i class="fa fa-eye" id="toggleIcon" onclick="togglePassword('password', 'toggleIcon')"></i>
+							id="password" name="password" placeholder="Create password" /> <i
+							class="fa fa-eye" id="toggleIcon"
+							onclick="togglePassword('password', 'toggleIcon')"></i>
 					</div>
 					<div class="field-group">
 						<label for="repassword">Re-enter Password</label> <input
 							type="password" id="repassword" name="repassword"
-							placeholder="Confirm password" required /> <i class="fa fa-eye"
-							id="toggleIcon1" onclick="togglePassword('repassword', 'toggleIcon1')"></i>
+							placeholder="Confirm password" /> <i class="fa fa-eye"
+							id="toggleIcon1"
+							onclick="togglePassword('repassword', 'toggleIcon1')"></i>
 					</div>
 				</div>
 
@@ -85,11 +88,10 @@
 			</form>
 
 			<p>
-				Already have an account? <a href="${contextPath}/login">Login
-					here</a>
+				Already have an account? <a href="${contextPath}/login">Login</a>
 			</p>
 		</div>
-	</div>             
+	</div>
 </body>
 <script type="text/javascript" src="${contextPath}/js/passwordToggle.js"></script>
 </html>

@@ -29,10 +29,14 @@
 				<div class="error-message">${error}</div>
 			</c:if>
 
+			<c:if test="${not empty message}">
+				<div class="success-message">${message}</div>
+			</c:if>
+
 			<form action="login" method="POST">
-				<input type="text" name="username" placeholder="Enter your username"
-					required /> <input type="password" name="password" id="loginpass"
-					placeholder="Enter your password" required /> <i class="fa fa-eye"
+				<input type="text" name="username" placeholder="Enter your username" />
+				<input type="password" name="password" id="loginpass"
+					placeholder="Enter your password" /> <i class="fa fa-eye"
 					id="toggleIcon" onclick="togglePassword('loginpass', 'toggleIcon')"></i>
 				<div class="extra-links">
 					<a href="#" onclick="openModal()">Forgot password?</a>
@@ -45,28 +49,27 @@
 				Don’t have an account? <a href="${contextPath}/register">Register
 					here</a>
 			</div>
-			
+
 			<!-- Forgot Password Modal -->
 			<div id="forgotPasswordModal" class="modal"
 				style="${not empty error || not empty message ? 'display: block;' : ''}">
 				<div class="modal-content">
 					<span class="close" onclick="closeModal()">&times;</span>
 					<h3>Reset Password</h3>
-
 					<c:if test="${not empty error}">
 						<div class="error-message">${error}</div>
 					</c:if>
-					<c:if test="${not empty message}">
-						<div class="success-message">${message}</div>
-					</c:if>
-
 					<form action="${contextPath}/forgetPassword" method="POST">
 						<input type="email" name="email"
 							placeholder="Enter your registered email" required /> <input
-							type="password" name="newPassword"
-							placeholder="Enter new password" required /> <input
-							type="password" name="confirmPassword"
-							placeholder="Confirm new password" required /> <input
+							type="password" id="npassword" name="newPassword"
+							placeholder="Enter new password" required /> <i
+							class="fa fa-eye" id="toggleIcon1"
+							onclick="togglePassword('npassword', 'toggleIcon1')"></i> <input
+							type="password" id="cpassword" name="confirmPassword"
+							placeholder="Confirm new password" required /> <i
+							class="fa fa-eye" id="toggleIcon2"
+							onclick="togglePassword('cpassword', 'toggleIcon2')"></i> <input
 							type="submit" value="Change Password" />
 					</form>
 				</div>

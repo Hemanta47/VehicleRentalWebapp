@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
@@ -23,7 +23,7 @@
 			<p onclick="showSection('profileSection')">Profile</p>
 			<p onclick="showSection('passwordSection')">Password</p>
 			<p onclick="showSection('historySection')">Rental History</p>
-			<form method="POST" action="${contextPath}/delete-account"
+			<form method="POST" action="${contextPath}/deleteAccount"
 				onsubmit="return confirm('Are you sure you want to delete your account?');">
 				<input type="hidden" name="username" value="${user.uName}" />
 				<button class="danger-btn">Delete Account</button>
@@ -55,18 +55,22 @@
 						<button onclick="closePopup('popup')">OK</button>
 					</div>
 				</c:if>
+
+				<c:if test="${passwordStatus == 'success'}">
+					<div id="popup" class="popup">
+						Password successfully updated!
+						<button onclick="closePopup('popup')">OK</button>
+					</div>
+				</c:if>
 			</div>
 
 			<!-- Password Section -->
 			<div id="passwordSection" class="section">
-				<h2>
-					Password
-					<button class="edit-toggle" onclick="toggleEdit('password')">Edit</button>
-				</h2>
+				<h2>Password</h2>
 
 				<!-- Entire form hidden initially -->
 				<form id="passwordForm" method="POST"
-					action="${contextPath}/updatePassword" style="display: none;">
+					action="${contextPath}/updatePassword">
 					<input type="hidden" name="username" value="${user.uName}" /> <label>Old
 						Password:</label>
 					<div class="password-wrapper">
@@ -86,13 +90,6 @@
 
 					<button type="submit" id="savePassword">Save</button>
 				</form>
-				<c:if test="${passwordStatus == 'success'}">
-					<div id="popup1" class="popup">
-						Password successfully updated!
-						<button onclick="closePopup('popup1')">OK</button>
-					</div>
-				</c:if>
-
 				<c:if test="${not empty sessionScope.passwordUpdatedAt}">
 					<p class="timestamp">
 						Last updated:
@@ -117,18 +114,22 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr>
-							<td>101</td>
-							<td>Honda Civic</td>
-							<td>$200</td>
-							<td>Confirmed</td>
-						</tr>
-						<tr>
-							<td>102</td>
-							<td>Ford Mustang</td>
-							<td>$450</td>
-							<td>Cancelled</td>
-						</tr>
+							<c:if test="${empty rentList}">
+							<tr>
+								<td colspan="4">Not Data Found</td>
+							</tr>
+						</c:if>
+
+							<c:if test="${not empty rentList}">
+								<c:forEach items="${rentList}" var="rent">
+								<tr>
+									<td>${rent.rentalId}</td>
+									<td>${rent.vehicleName}</td>
+									<td>Rs.${rent.amount}</td>
+									<td>${rent.status}</td>
+								</tr>
+							</c:forEach>
+							</c:if>
 					</tbody>
 				</table>
 			</div>
@@ -147,11 +148,7 @@
             inputs.forEach(inp => inp.disabled = false);
             saveBtn.style.display = 'inline-block';
             document.querySelector('#profileSection .edit-toggle').style.display = 'none';
-        } else if (section === 'password') {
-            const passwordForm = document.getElementById('passwordForm');
-            passwordForm.style.display = 'block';
-            document.querySelector('#passwordSection .edit-toggle').style.display = 'none';
-        }
+        } 
     }
     
     function closePopup(id) {

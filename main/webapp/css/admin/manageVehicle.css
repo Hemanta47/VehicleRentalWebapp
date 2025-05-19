@@ -85,3 +85,18 @@
 .form-footer button:hover {
 	background: var(--primary-dark);
 }
+
+.btn-group{
+	display: flex;
+	gap: 1rem;
+}
+
+.btn-group a{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.delete-btn{
+	padding: .5rem;
+}

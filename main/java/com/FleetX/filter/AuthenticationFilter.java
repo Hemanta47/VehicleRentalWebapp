@@ -15,79 +15,104 @@ import java.io.IOException;
 import com.FleetX.util.CookieUtil;
 import com.FleetX.util.SessionUtil;
 
-/**
- * Servlet Filter implementation class AuthenticationFilter
- */
+@SuppressWarnings("serial")
 @WebFilter("/AuthenticationFilter")
 public class AuthenticationFilter extends HttpFilter implements Filter {
-	private static final String LOGIN = "/login";
-	private static final String REGISTER = "/register";
-	private static final String HOME = "/home";
-	private static final String ROOT = "/";
-	private static final String DASHBOARD = "/Dashboard";
-	private static final String ABOUT = "/about";
-	private static final String CONTACT = "/contact";
 
-	/**
-	 * @see Filter#destroy()
-	 */
-	public void destroy() {
-		// TODO Auto-generated method stub
-	}
+    // Common
+    private static final String LOGIN = "/login";
+    private static final String REGISTER = "/register";
+    private static final String ROOT = "/";
+    private static final String HOME = "/home";
+    private static final String ABOUT = "/about";
 
-	/**
-	 * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
-	 */
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-			throws IOException, ServletException {
-		HttpServletRequest req = (HttpServletRequest) request;
-		HttpServletResponse res = (HttpServletResponse) response;
+    // Admin Routes
+    private static final String DASHBOARD = "/Dashboard";
+    private static final String EDIT_VEHICLE = "/EditVehicle";
 
-		String uri = req.getRequestURI();
+    // Customer Routes
+    private static final String VEHICLE = "/vehicle";
+    private static final String VEHICLE_DETAIL = "/vehicleDetail";
+    private static final String CHECKOUT = "/checkout";
+    private static final String CART = "/cart";
+    private static final String USER_PROFILE = "/userprofile";
+    private static final String CONTACT = "/contact";
 
-		if (uri.endsWith(".css") || uri.endsWith(HOME) || uri.endsWith(ROOT)) {
-			chain.doFilter(request, response);
-			return;
-		}
+    @Override
+    public void destroy() {
+        // Not used
+    }
 
-		boolean isLoggedIn = SessionUtil.getAttribute(req, "username") != null;
-		String userRole = CookieUtil.getCookie(req, "role") != null ? CookieUtil.getCookie(req, "role").getValue()
-				: null;
+    @Override
+    public void init(FilterConfig fConfig) throws ServletException {
+        // Not used
+    }
 
-		if ("admin".equals(userRole)) {
-			if (uri.endsWith(LOGIN) || uri.endsWith(REGISTER)) {
-				res.sendRedirect(req.getContextPath() + DASHBOARD);
-			} else if (uri.endsWith(DASHBOARD) || uri.endsWith(HOME) || uri.endsWith(ROOT)) {
-				chain.doFilter(request, response);
-			} else {
-				res.sendRedirect(req.getContextPath() + DASHBOARD);
-			}
-		} else if ("customer".equals(userRole)) {
-			// User is logged in
-			if (uri.endsWith(LOGIN) || uri.endsWith(REGISTER)) {
-				res.sendRedirect(req.getContextPath() + HOME);
-			} else if (uri.endsWith(HOME) || uri.endsWith(ROOT) || uri.endsWith(ABOUT) || uri.endsWith(CONTACT)) {
-				chain.doFilter(request, response);
-			} else if (uri.endsWith(DASHBOARD)) {
-				res.sendRedirect(req.getContextPath() + HOME);
-			} else {
-				res.sendRedirect(req.getContextPath() + HOME);
-			}
-		} else {
-			// Not logged in
-			if (uri.endsWith(LOGIN) || uri.endsWith(REGISTER) || uri.endsWith(HOME) || uri.endsWith(ROOT)) {
-				chain.doFilter(request, response);
-			} else {
-				res.sendRedirect(req.getContextPath() + LOGIN);
-			}
-		}
-	}
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
 
-	/**
-	 * @see Filter#init(FilterConfig)
-	 */
-	public void init(FilterConfig fConfig) throws ServletException {
-		// TODO Auto-generated method stub
-	}
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
 
+        String uri = req.getRequestURI();
+        String ctx = req.getContextPath();
+        boolean isLoggedIn = SessionUtil.getAttribute(req, "username") != null;
+        String role = CookieUtil.getCookie(req, "role") != null ? CookieUtil.getCookie(req, "role").getValue() : null;
+
+        // Whitelisted URIs (always allowed)
+        if (uri.endsWith(ROOT) || uri.endsWith(HOME) || uri.endsWith(ABOUT)
+                || uri.endsWith(LOGIN) || uri.endsWith(REGISTER)
+                || uri.endsWith(".css") || uri.endsWith(".js") || uri.contains("/assets/")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        // Admin Access Control
+        if ("admin".equals(role)) {
+            if (uri.endsWith(LOGIN) || uri.endsWith(REGISTER)) {
+                res.sendRedirect(ctx + DASHBOARD);
+            } else if (uri.startsWith(ctx + DASHBOARD) || uri.startsWith(ctx + EDIT_VEHICLE)) {
+                chain.doFilter(request, response);
+            } else {
+                // Restrict admin from accessing customer pages
+                res.sendRedirect(ctx + DASHBOARD);
+            }
+            return;
+        }
+
+        // Customer Access Control
+        if ("customer".equals(role)) {
+            if (uri.endsWith(LOGIN) || uri.endsWith(REGISTER)) {
+                res.sendRedirect(ctx + HOME);
+            } else if (uri.startsWith(ctx + VEHICLE)
+                    || uri.startsWith(ctx + VEHICLE_DETAIL)
+                    || uri.startsWith(ctx + CHECKOUT)
+                    || uri.startsWith(ctx + CART)
+                    || uri.startsWith(ctx + USER_PROFILE)
+                    || uri.startsWith(ctx + CONTACT)
+                    || uri.startsWith(ctx + HOME)) {
+                chain.doFilter(request, response);
+            } else {
+                // Restrict customer from accessing admin or other protected pages
+                res.sendRedirect(ctx + HOME);
+            }
+            return;
+        }
+
+        // Not Logged In: restrict access to protected routes
+        if (uri.startsWith(ctx + VEHICLE)
+                || uri.startsWith(ctx + VEHICLE_DETAIL)
+                || uri.startsWith(ctx + CHECKOUT)
+                || uri.startsWith(ctx + CART)
+                || uri.startsWith(ctx + USER_PROFILE)
+                || uri.startsWith(ctx + DASHBOARD)
+                || uri.startsWith(ctx + EDIT_VEHICLE)) {
+            res.sendRedirect(ctx + LOGIN);
+            return;
+        }
+
+        // Allow all others
+        chain.doFilter(request, response);
+    }
 }

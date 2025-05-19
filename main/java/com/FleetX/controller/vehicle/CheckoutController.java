@@ -1,4 +1,4 @@
-package com.FleetX.controller;
+package com.FleetX.controller.vehicle;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -34,21 +34,5 @@ public class CheckoutController extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/Pages/checkout.jsp").forward(request, response);
     }
 
-    // Handle order confirmation on POST
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        CartService cartService = new CartService(request.getSession());
-
-        List<CartModel> cartItems = cartService.getCartItems();
-        BigDecimal totalValue = cartService.calculateTotalPrice(); // Corrected
-
-        // Set checkout attributes
-        request.setAttribute("cartItems", cartItems);
-        request.setAttribute("totalValue", totalValue);
-
-        // Clear the cart
-        cartService.clearCart();
-
-        // Forward to confirmation page
-        request.getRequestDispatcher("/WEB-INF/Pages/confirmation.jsp").forward(request, response);
-    }
+   
 }

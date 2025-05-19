@@ -11,6 +11,7 @@
 <title>Admin Dashboard</title>
 <script src="https://kit.fontawesome.com/a63c128ded.js"
 	crossorigin="anonymous"></script>
+
 <link rel="stylesheet" href="${contextPath}/css/admin/global.css" />
 <link rel="stylesheet" href="${contextPath}/css/admin/dashboard.css" />
 <link rel="stylesheet" href="${contextPath}/css/admin/manageVehicle.css" />
@@ -26,14 +27,23 @@
 		<div class="profile">
 			<div>
 				<img src="${contextPath}/assets/bg-img/no-profile.jpg"
-					alt="Profile Pic" /> <span>${sessionScope.username != null ? sessionScope.username : 'Admin'}</span>
+					alt="Profile Pic" /> <span> <c:choose>
+						<c:when test="${not empty sessionScope.username}">
+							<span>${sessionScope.username}</span>
+						</c:when>
+						<c:otherwise>
+							<span>Admin</span>
+						</c:otherwise>
+					</c:choose>
+
+				</span>
 			</div>
 			<a href="${contextPath}/" target="_blank" class="public-link"><i
-				class="fas fa-globe"></i>Public</a> 
-				<form action="${contextPath}/logout" method="post">
-							<input type="submit" class="nav-button" value="Logout" />
-				</form>
-				
+				class="fas fa-globe"></i>Public</a>
+			<form action="${contextPath}/logout" method="post">
+				<input type="submit" class="nav-button" value="Logout" />
+			</form>
+
 		</div>
 	</header>
 
@@ -62,11 +72,132 @@
 
 		<!-- Dashboard Section -->
 		<section id="dashboard" class="main active-main">
-			<jsp:include page="./dashboardContent.jsp" />
+
+			<div class="welcome-section">
+				<h2 class="welcome-title">Welcome, Admin!</h2>
+				<p class="welcome-subtitle">Manage your vehicle fleet
+					efficiently with the FleetX dashboard.</p>
+			</div>
+
+			<div class="dashboard-grid">
+				<div class="stat-card">
+					<div class="stat-header">
+						<div class="stat-title">Total Vehicles</div>
+						<div class="stat-icon blue">
+							<i class="fas fa-car"></i>
+						</div>
+					</div>
+					<div class="stat-value">${totalVehicle}</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-header">
+						<div class="stat-title">Active Bookings</div>
+						<div class="stat-icon green">
+							<i class="fas fa-calendar-check"></i>
+						</div>
+					</div>
+					<div class="stat-value">${totalBooking}</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-header">
+						<div class="stat-title">Registered Users</div>
+						<div class="stat-icon orange">
+							<i class="fas fa-users"></i>
+						</div>
+					</div>
+					<div class="stat-value">${totalUser}</div>
+
+				</div>
+				<div class="stat-card">
+					<div class="stat-header">
+						<div class="stat-title">Messages</div>
+						<div class="stat-icon red">
+							<i class="fas fa-envelope"></i>
+						</div>
+					</div>
+					<div class="stat-value">${totalMessage}</div>
+				</div>
+			</div>
+
+			<div class="tables-container">
+
+				<!-- Table 1: Booking Trend -->
+				<div class="dashboard-table">
+					<h3>Daily Booking Trend</h3>
+					<table>
+						<thead>
+							<tr>
+								<th>Date</th>
+								<th>Total Bookings</th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:forEach var="trend" items="${bookingTrend}">
+								<tr>
+									<td>${trend.bookingDate}</td>
+									<td>${trend.totalBookings}</td>
+								</tr>
+							</c:forEach>
+						</tbody>
+					</table>
+					<div class="view-all-btn">
+						<a href="#" data-target="booking">View All</a>
+					</div>
+				</div>
+
+				<!-- Table 2: Recent User Registrations -->
+				<div class="dashboard-table">
+					<h3>New User</h3>
+					<table>
+						<thead>
+							<tr>
+								<th>Name</th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:forEach var="user" items="${Only5User}">
+								<tr>
+									<td>${user.fname} ${user.lname}</td>
+								</tr>
+							</c:forEach>
+						</tbody>
+					</table>
+					<div class="view-all-btn">
+						<a href="#" data-target="user">View All</a>
+					</div>
+				</div>
+
+				<!-- Table 3: Recent Messages -->
+				<div class="dashboard-table">
+					<h3>Recent Messages from Users</h3>
+					<table>
+						<thead>
+							<tr>
+								<th>Message</th>
+								<th>Received On</th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:forEach var="msg" items="${MessageList}">
+								<tr>
+									<td>${msg.content}</td>
+									<td>${msg.sentAt}</td>
+								</tr>
+							</c:forEach>
+						</tbody>
+					</table>
+					<div class="view-all-btn">
+						<a href="#" data-target="messageContent">View All</a>
+					</div>
+				</div>
+
+			</div>
+
 		</section>
 
 		<!-- Manage Vehicles -->
 		<section id="manageVehicle" class="main">
+
 			<div class="content">
 				<div class="content-header">
 					<h2 class="section-title">Vehicle Fleet</h2>
@@ -84,7 +215,7 @@
 								<th>Fuel Type</th>
 								<th>Transmission</th>
 								<th>Capacity</th>
-								<th>ImageUrl</th>
+								<th>Image</th>
 								<th>Status</th>
 								<th>Location</th>
 								<th>Actions</th>
@@ -93,7 +224,7 @@
 						<tbody>
 							<c:forEach items="${VehicleList}" var="vehicle">
 								<tr>
-									<td>${vehicle.id}</td>
+									<td>V${vehicle.id}</td>
 									<td>
 										<div>
 											<strong>${vehicle.brand}${vehicle.model}</strong>
@@ -106,17 +237,23 @@
 									<td>${vehicle.fuelType}</td>
 									<td>${vehicle.transmission}</td>
 									<td>${vehicle.capacity}</td>
-									<td>${vehicle.imageUrl}</td>
+									<td><img alt="${vehicle.model}"
+										src="${contextPath}/assets/vehicle/${vehicle.imageUrl}" width="80"
+										height="50" style="object-fit: cover;"></td>
 									<td><span class="status status-available">${vehicle.status}</span></td>
 									<td>${vehicle.location}</td>
 									<td>
 										<div class="btn-group">
-											<button class="action-btn edit-btn" title="Edit">
-												<i class="fas fa-edit"></i>
-											</button>
-											<button class="action-btn delete-btn" title="Delete">
-												<i class="fas fa-trash"></i>
-											</button>
+											<a href="${contextPath}/EditVehicle?vehicleId=${vehicle.id}"
+												class="action-btn edit-btn" title="Edit"> <i
+												class="fas fa-edit"></i>
+											</a>
+											<form class="deleteBtn" method="post" action="deleteVehicle">
+												<input type="hidden" name="vehicleID" value="${vehicle.id}" />
+												<button type="submit" class="action-btn delete-btn">
+													<i class="fas fa-trash"></i>
+												</button>
+											</form>
 										</div>
 									</td>
 								</tr>
@@ -128,11 +265,7 @@
 		</section>
 
 		<!-- Add Vehicle -->
-		<section id="addVehicle" class="main" >
-			<div class="page-header">
-				<h2>Add New Vehicle</h2>
-			</div>
-
+		<section id="addVehicle" class="main">
 			<div class="vehicle-form-container">
 				<div class="vehicle-form-wrapper">
 					<div class="form-header">
@@ -140,134 +273,114 @@
 					</div>
 
 					<div class="form-body">
-						<form action="AddVehicle" method="POST" enctype="multipart/form-data">
+						<form action="AddVehicle" method="POST"
+							enctype="multipart/form-data">
 							<div class="form-section">
-								<h4 class="section-title">
-									<i class="fas fa-info-circle"></i> Basic Information
-								</h4>
+								<h4 class="section-title">Basic Information</h4>
 								<div class="form-row">
 									<div class="form-group">
-										<label for="category"><i class="fas fa-tag"></i>
-											Category</label> <input type="text" id="category" name="category"
-											placeholder="e.g. car or bike" required> <span
-											class="input-icon"><i class="fas fa-car-side"></i></span>
+										<label for="category">Category</label> <select id="category"
+											name="category" required>
+											<option value="">-- Select Category --</option>
+											<option value="Car">Car</option>
+											<option value="Bike">Bike</option>
+										</select>
 									</div>
 									<div class="form-group">
-										<label for="brand"><i class="fas fa-building"></i>
-											Brand</label> <input type="text" id="brand" name="brand"
-											placeholder="e.g. Toyota, Honda, BMW" required> <span
-											class="input-icon"><i class="fas fa-trademark"></i></span>
+										<label for="brand">Brand</label> <input type="text" id="brand"
+											name="brand" placeholder="e.g. Toyota, Honda" required>
 									</div>
 								</div>
 
 								<div class="form-row">
 									<div class="form-group">
-										<label for="model"><i class="fas fa-car"></i> Model</label> <input
-											type="text" id="model" name="model"
-											placeholder="e.g. Camry, Civic, X5" required> <span
-											class="input-icon"><i class="fas fa-car"></i></span>
+										<label for="model">Model</label> <input type="text" id="model"
+											name="model" placeholder="e.g. Camry, Civic" required>
 									</div>
 									<div class="form-group">
-										<label for="year"><i class="fas fa-calendar-alt"></i>
-											Year</label> <input type="number" id="year" name="year"
-											placeholder="e.g. 2023" required> <span
-											class="input-icon"></span>
+										<label for="year">Year</label> <input type="number" id="year"
+											name="year" placeholder="e.g. 2023" required>
 									</div>
 								</div>
 							</div>
 
 							<div class="form-section">
-								<h4 class="section-title">
-									<i class="fas fa-id-card"></i> Registration & Pricing
-								</h4>
+								<h4 class="section-title">Registration & Pricing</h4>
 								<div class="form-row">
 									<div class="form-group">
-										<label for="registrationNumber"><i
-											class="fas fa-id-badge"></i> Registration Number</label> <input
+										<label for="registrationNumber">Registration Number</label> <input
 											type="text" id="registrationNumber" name="registrationNumber"
-											placeholder="e.g. ABC-1234" required> <span
-											class="input-icon"><i class="fas fa-fingerprint"></i></span>
+											placeholder="e.g. ABC-1234" required>
 									</div>
 									<div class="form-group">
-										<label for="dailyRate">Rs. Daily Rate (Rs.)</label> <input
+										<label for="dailyRate">Daily Rate (Rs.)</label> <input
 											type="number" id="dailyRate" name="dailyRate"
-											placeholder="e.g. 50" required> <span
-											class="input-icon"><i class="fas fa-money-bill-wave"></i></span>
+											placeholder="e.g. 50" required>
 									</div>
 								</div>
 							</div>
 
 							<div class="form-section">
-								<h4 class="section-title">
-									<i class="fas fa-cogs"></i> Technical Specifications
-								</h4>
+								<h4 class="section-title">Technical Specifications</h4>
 								<div class="form-row">
 									<div class="form-group">
-										<label for="fuelType"><i class="fas fa-gas-pump"></i>
-											Fuel Type</label> <input type="text" id="fuelType" name="fuelType"
-											placeholder="e.g. Petrol, Diesel, Electric" required>
-										<span class="input-icon"><i
-											class="fas fa-charging-station"></i></span>
+										<label for="fuelType">Fuel Type</label> <select id="fuelType"
+											name="fuelType" required>
+											<option value="">-- Select Fuel Type --</option>
+											<option value="EV">EV</option>
+											<option value="Petrol">Petrol</option>
+											<option value="Diesel">Diesel</option>
+										</select>
 									</div>
 									<div class="form-group">
-										<label for="transmission"><i class="fas fa-cog"></i>
-											Transmission</label> <input type="text" id="transmission"
-											name="transmission" placeholder="e.g. Automatic, Manual"
-											required> <span class="input-icon"><i
-											class="fas fa-cogs"></i></span>
+										<label for="transmission">Transmission</label> <select
+											id="transmission" name="transmission" required>
+											<option value="">-- Select Transmission --</option>
+											<option value="Automatic">Automatic</option>
+											<option value="Manual">Manual</option>
+										</select>
 									</div>
 								</div>
 
 								<div class="form-row">
 									<div class="form-group">
-										<label for="capacity"><i class="fas fa-users"></i>
-											Capacity</label> <input type="number" id="capacity" name="capacity"
-											placeholder="e.g. 5" required> <span
-											class="input-icon"><i class="fas fa-user-friends"></i></span>
+										<label for="capacity">Capacity</label> <input type="number"
+											id="capacity" name="capacity" placeholder="e.g. 5" required>
 									</div>
 									<div class="form-group">
-										<label for="status"><i class="fas fa-info-circle"></i>
-											Status</label>
-										<!-- Replace input field with a select dropdown -->
-										<select id="status" name="status" required>
-											<option value="Available">Available</option>
-											<option value="Maintenance">Maintenance</option>
-											<option value="Booked">Booked</option>
-										</select> <span class="input-icon"></span>
+										<label for="status">Status</label> <select id="status"
+											name="status" required>
+											<option value="available">Available</option>
+											<option value="rented">Rented</option>
+										</select>
 									</div>
 								</div>
 							</div>
 
 							<div class="form-section">
-								<h4 class="section-title">
-									<i class="fas fa-map-marker-alt"></i> Location & Media
-								</h4>
+								<h4 class="section-title">Location & Media</h4>
 								<div class="form-row">
 									<div class="form-group">
-										<label for="imageUrl"><i class="fas fa-image"></i>
-											Image File</label>
-										<!-- Replace input for URL with file input -->
-										<input type="file" id="imageUrl" name="imageUrl"
-											accept="image/*" required> <span class="input-icon"><i
-											class="fas fa-camera"></i></span>
+										<label for="imageUrl">Image File</label> <input type="file"
+											id="imageUrl" name="imageUrl" accept="image/*" required>
 									</div>
 									<div class="form-group">
-										<label for="location"><i class="fas fa-map-pin"></i>
-											Location</label> <input type="text" id="location" name="location"
-											placeholder="e.g. Downtown Branch" required> <span
-											class="input-icon"><i class="fas fa-map-marked-alt"></i></span>
+										<label for="location">Location</label> <select id="location"
+											name="location" required>
+											<option value="">-- Select Location --</option>
+											<option value="Kathmandu">Kathmandu</option>
+											<option value="Lalitpur">Lalitpur</option>
+											<option value="Bhaktapur">Bhaktapur</option>
+										</select>
 									</div>
 								</div>
 							</div>
 
 							<div class="form-section">
-								<h4 class="section-title">
-									<i class="fas fa-file-alt"></i> Additional Details
-								</h4>
+								<h4 class="section-title">Additional Details</h4>
 								<div class="form-row">
 									<div class="form-group full">
-										<label for="description"><i class="fas fa-align-left"></i>
-											Description</label>
+										<label for="description">Description</label>
 										<textarea id="description" name="description"
 											placeholder="Detailed description of the vehicle..."></textarea>
 									</div>
@@ -275,18 +388,15 @@
 
 								<div class="form-row">
 									<div class="form-group full">
-										<label for="features"><i class="fas fa-list-ul"></i>
-											Features</label> <input type="text" id="features" name="features"
+										<label for="features">Features</label> <input type="text"
+											id="features" name="features"
 											placeholder="e.g. GPS, Bluetooth, Leather Seats (comma separated)">
-										<span class="input-icon"><i class="fas fa-star"></i></span>
 									</div>
 								</div>
 							</div>
 
 							<div class="form-footer">
-								<button type="submit">
-									<i class="fas fa-plus-circle"></i> Add Vehicle
-								</button>
+								<button type="submit">Add Vehicle</button>
 							</div>
 						</form>
 					</div>
@@ -297,7 +407,54 @@
 
 		<!-- Bookings -->
 		<section id="booking" class="main">
-			<jsp:include page="./bookingContent.jsp" />
+			<div class="content">
+				<div class="content-header">
+					<h2 class="section-title">Current Bookings</h2>
+				</div>
+
+				<div class="table-container">
+					<table class="data-table">
+						<thead>
+							<tr>
+								<th>Booking ID</th>
+								<th>Vehicle ID</th>
+								<th>Start Date</th>
+								<th>End Date</th>
+								<th>Pickup Location</th>
+								<th>Drop Location</th>
+								<th>Rental Days</th>
+								<th>Total Price</th>
+								<th>Customer ID</th>
+								<th>Status</th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:if test="${empty BookingList}">
+								<tr>
+									<td colspan="5">No rental found or data not loaded
+										correctly.</td>
+								</tr>
+							</c:if>
+							<c:forEach items="${BookingList}" var="rent">
+								<c:if test="${not empty BookingList }">
+									<tr>
+										<td>B${rent.rentalId}</td>
+										<td>R${rent.vehicleId}</td>
+										<td>${rent.startDate}</td>
+										<td>${rent.endDate}</td>
+										<td>${rent.address}</td>
+										<td>${rent.dropAddress}</td>
+										<td>${rent.rentalDays}</td>
+										<td>Rs.${rent.amount}</td>
+										<td>U${rent.userId}</td>
+										<td>${rent.status}</td>
+									</tr>
+								</c:if>
+							</c:forEach>
+						</tbody>
+					</table>
+				</div>
+			</div>
 		</section>
 
 		<!-- Users -->
@@ -326,7 +483,7 @@
 					<c:forEach items="${UserList}" var="user">
 						<c:if test="${not empty user}">
 							<tr>
-								<td>${user.id}</td>
+								<td>U${user.id}</td>
 								<td>${user.fname}</td>
 								<td>${user.lname}</td>
 								<td>${user.uName}</td>
@@ -350,70 +507,39 @@
 
 		<!-- Messages -->
 		<section id="messageContent" class="main">
-			<jsp:include page="./messageContent.jsp" />
+			<table class="data-table">
+				<thead>
+					<tr>
+						<th>Message ID</th>
+						<th>From</th>
+						<th>Subject</th>
+						<th>Date</th>
+						<th>Message</th>
+					</tr>
+				</thead>
+				<tbody>
+					<c:if test="${empty MessageList}">
+						<tr>
+							<td colspan="5">No message found or data not loaded
+								correctly.</td>
+						</tr>
+					</c:if>
+					<c:forEach items="${MessageList}" var="message">
+						<tr>
+							<td>M${message.messageId}</td>
+							<td>${message.email}</td>
+							<td>${message.subject}</td>
+							<td>${message.sentAt}</td>
+							<td>${message.content}</td>
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
 		</section>
+
 	</div>
 
-	<script>
-  window.addEventListener('DOMContentLoaded', () => {
-	  const links = document.querySelectorAll('.sidebar nav ul li a');
-	  links.forEach(link => {
-	    link.addEventListener('click', e => {
-	      e.preventDefault();
-	      activateSection(link.dataset.target, link);
-	    });
-	  });
-
-	  // Attach sidebar toggle
-	  const minimizeBtn = document.querySelector('.minimize');
-	  if (minimizeBtn) {
-	    minimizeBtn.addEventListener('click', toggleSidebar);
-	  }
-	});
-
-    function toggleSidebar() {
-      const sidebar = document.querySelector('.sidebar');
-      const icon = document.querySelector('.minimize i');
-      sidebar.classList.toggle('collapsed');
-
-      document.querySelectorAll('.main.active-main').forEach(main => {
-        if (sidebar.classList.contains('collapsed')) {
-          main.classList.add('expanded');
-        } else {
-          main.classList.remove('expanded');
-        }
-      });
-
-      icon.classList.toggle('fa-circle-chevron-left');
-      icon.classList.toggle('fa-circle-chevron-right');
-    }
-
-    function activateSection(id, link) {
-      // Hide all
-      document.querySelectorAll('.main').forEach(main => {
-        main.classList.remove('active-main', 'expanded');
-      });
-
-      const target = document.getElementById(id);
-      target.classList.add('active-main');
-
-      if (document.querySelector('.sidebar.collapsed')) {
-        target.classList.add('expanded');
-      }
-
-      document.querySelectorAll('.sidebar nav ul li a').forEach(a => a.classList.remove('active'));
-      link.classList.add('active');
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      const links = document.querySelectorAll('.sidebar nav ul li a');
-      links.forEach(link => {
-        link.addEventListener('click', e => {
-          e.preventDefault();
-          activateSection(link.dataset.target, link);
-        });
-      });
-    });
-  </script>
 </body>
+<script type="text/javascript" src="${contextPath}/js/adminSection.js"></script>
 </html>
+

@@ -1,12 +1,5 @@
 package com.FleetX.controller.admin;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-
-import com.FleetX.model.VehicleModel;
-import com.FleetX.service.VehicleService;
-import com.FleetX.util.ImageUtil;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,23 +8,23 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 
-@SuppressWarnings("serial")
-@WebServlet("/AddVehicle")
-@MultipartConfig(
-    fileSizeThreshold = 1024 * 1024 * 2,  // 2MB
-    maxFileSize = 1024 * 1024 * 10,       // 10MB
-    maxRequestSize = 1024 * 1024 * 50     // 50MB
-)
-public class AddVehicleController extends HttpServlet {
+import java.io.IOException;
+import java.math.BigDecimal;
 
+import com.FleetX.model.VehicleModel;
+import com.FleetX.service.VehicleService;
+import com.FleetX.util.ImageUtil;
+
+@WebServlet(asyncSupported = true, urlPatterns = { "/UpdateVehicle" })
+@MultipartConfig
+public class UpdateVehicleController extends HttpServlet {
+    private static final long serialVersionUID = 1L;
     private VehicleService vehicleService;
 
-    @Override
-    public void init() {
+    public UpdateVehicleController() {
         vehicleService = new VehicleService();
     }
 
-    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -40,6 +33,7 @@ public class AddVehicleController extends HttpServlet {
 
         try {
             // === Collect vehicle form data ===
+            int id = Integer.parseInt(request.getParameter("id"));
             String category = request.getParameter("category").toLowerCase();
             String brand = request.getParameter("brand");
             String model = request.getParameter("model");
@@ -53,39 +47,48 @@ public class AddVehicleController extends HttpServlet {
             String location = request.getParameter("location");
             String description = request.getParameter("description");
             String features = request.getParameter("features");
+            String existingImageUrl = request.getParameter("existingImageUrl");
 
             // === Image upload handling ===
             Part imagePart = request.getPart("imageUrl");
             String appPath = request.getServletContext().getRealPath("");
-            String imageUrl = new ImageUtil().uploadImage(imagePart, appPath, category);
+            String imageUrl;
 
-            if (imageUrl == null) {
-                throw new IOException("Image upload failed.");
+            if (imagePart != null && imagePart.getSize() > 0) {
+                // New image uploaded
+                imageUrl = new ImageUtil().uploadImage(imagePart, appPath, category);
+                if (imageUrl == null) {
+                    throw new IOException("Image upload failed.");
+                }
+            } else {
+                // Keep existing image
+                imageUrl = existingImageUrl;
             }
 
-            // === Create vehicle object ===
-            VehicleModel vehicle = new VehicleModel(
+            // === Create updated vehicle object ===
+            VehicleModel vehicle = new VehicleModel(id,
                 category, brand, model, year, registrationNumber,
                 dailyRate, fuelType, transmission, capacity, status,
                 imageUrl, location, description, features
             );
 
-            // === Store vehicle in database ===
-            boolean success = vehicleService.insertVehicle(vehicle);
+            // === Store updated vehicle in database ===
+            boolean success = vehicleService.updateVehicle(vehicle);
 
             if (success) {
-                System.out.println("Vehicle added successfully!");
+                request.getSession().setAttribute("message", "Vehicle updated successfully!");
+                System.out.println("Vehicle updated successfully!");
             } else {
-                request.setAttribute("error", "Failed to add vehicle.");
-                System.err.println("Vehicle addition failed.");
+                request.getSession().setAttribute("error", "Failed to update vehicle.");
+                System.err.println("Vehicle update failed.");
             }
 
-            // Redirect to dashboard in both cases
+            // Redirect to dashboard
             response.sendRedirect(request.getContextPath() + "/Dashboard");
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Unexpected error occurred: " + e.getMessage());
+            request.getSession().setAttribute("error", "Unexpected error: " + e.getMessage());
             response.sendRedirect(request.getContextPath() + "/Dashboard");
         }
     }

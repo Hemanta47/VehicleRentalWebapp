@@ -36,39 +36,45 @@ public class RegisterController extends HttpServlet {
 	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-	        throws ServletException, IOException {
-	    request.setCharacterEncoding("UTF-8");
-	    String errorMessageString = validateRegistrationForm(request);
-	    if (errorMessageString != null) {
-	        request.setAttribute("error", errorMessageString);
-	        request.getRequestDispatcher("/WEB-INF/Pages/register.jsp").forward(request, response);
-	        return;
-	    }
+			throws ServletException, IOException {
+		request.setCharacterEncoding("UTF-8");
+		String errorMessageString = validateRegistrationForm(request);
+		if (errorMessageString != null) {
+			request.setAttribute("fname", request.getParameter("fname"));
+			request.setAttribute("lname", request.getParameter("lname"));
+			request.setAttribute("username", request.getParameter("username"));
+			request.setAttribute("dob", request.getParameter("dob"));
+			request.setAttribute("email", request.getParameter("email"));
+			request.setAttribute("phone", request.getParameter("phone"));
+			request.setAttribute("error", errorMessageString);
+			request.getRequestDispatcher("/WEB-INF/Pages/register.jsp").forward(request, response);
+			return;
+		}
 
-	    String fname = request.getParameter("fname");
-	    String lname = request.getParameter("lname");
-	    String uname = request.getParameter("username");
-	    String dob = request.getParameter("dob");
-	    String email = request.getParameter("email");
-	    String phone = request.getParameter("phone");
-	    String password = request.getParameter("password");
-	    password = PasswordUtil.encrypt(uname, password);
+		String fname = request.getParameter("fname");
+		String lname = request.getParameter("lname");
+		String uname = request.getParameter("username");
+		String dob = request.getParameter("dob");
+		String email = request.getParameter("email");
+		String phone = request.getParameter("phone");
+		String password = request.getParameter("password");
+		password = PasswordUtil.encrypt(uname, password);
 
-	    // Set default role
-	    String role = "customer"; 
+		// Set default role
+		String role = "customer";
 
-	    UserModel user = new UserModel(fname, lname, uname, dob, email, phone, password, role);
+		UserModel user = new UserModel(fname, lname, uname, dob, email, phone, password, role);
 
-	    RegisterService registerService = new RegisterService();
-	    boolean success = registerService.addUser(user);
+		RegisterService registerService = new RegisterService();
+		boolean success = registerService.addUser(user);
 
-	    if (success) {
-	        request.setAttribute("successMessage", "Registered successfully! Please login.");
-	    } else {
-	        request.setAttribute("error", "Registration failed. Please try again.");
-	    }
+		if (success) {
+			request.setAttribute("successMessage", "Registered successfully! Please login.");
+		} else {
+			request.setAttribute("error", "Registration failed. Please try again.");
+		}
 
-	    request.getRequestDispatcher("/WEB-INF/Pages/register.jsp").forward(request, response);
+		request.getRequestDispatcher("/WEB-INF/Pages/register.jsp").forward(request, response);
 	}
 
 	private String validateRegistrationForm(HttpServletRequest request) {
@@ -85,7 +91,7 @@ public class RegisterController extends HttpServlet {
 		if (ValidationUtil.isNullOrEmpty(fname))
 			return "First name is empty";
 		if (ValidationUtil.isNullOrEmpty(lname))
-			return "Last name is empyt";
+			return "Last name is empty";
 		if (ValidationUtil.isNullOrEmpty(uname))
 			return "Username is empty";
 		if (ValidationUtil.isNullOrEmpty(dob))
@@ -103,8 +109,7 @@ public class RegisterController extends HttpServlet {
 		try {
 			dobDate = LocalDate.parse(dob);
 		} catch (Exception e) {
-			// TODO: handle exception
-			 return "Invalid date format for DOB";
+			return "Invalid date format for DOB";
 		}
 
 		if (!ValidationUtil.isAlphabetic(fname))

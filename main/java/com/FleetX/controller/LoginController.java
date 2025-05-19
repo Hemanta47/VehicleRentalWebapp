@@ -52,7 +52,7 @@ public class LoginController extends HttpServlet {
                 redirectUrl = "/home";
             }
 
-            response.sendRedirect(request.getContextPath() + redirectUrl); // Redirect to the correct page
+            response.sendRedirect(request.getContextPath() + redirectUrl); 
         } else {
             // Error handling for failed login
             request.setAttribute("error", "User credential mismatch or Server is under maintenance");

@@ -22,9 +22,7 @@ public class UserModel {
         this.password = password;
     }
     
-    
-
-    public UserModel(String fname, String lname, String uName, String email, String phone) {
+	public UserModel(String fname, String lname, String uName, String email, String phone) {
 		this.fname = fname;
 		this.lname = lname;
 		this.uName = uName;

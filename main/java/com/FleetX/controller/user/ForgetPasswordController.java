@@ -1,4 +1,4 @@
-package com.FleetX.controller;
+package com.FleetX.controller.user;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -24,7 +24,6 @@ public class ForgetPasswordController extends HttpServlet {
 	 */
 	public ForgetPasswordController() {
 		userService = new UserService();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -39,7 +38,6 @@ public class ForgetPasswordController extends HttpServlet {
 
 		try {
 			String username = userService.getUsernameByEmail(email);
-
 			if (username == null) {
 				request.setAttribute("error", "Email not registered.");
 				request.getRequestDispatcher(loginUrl).forward(request, response);

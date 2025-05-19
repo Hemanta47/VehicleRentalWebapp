@@ -1,4 +1,4 @@
-package com.FleetX.controller;
+package com.FleetX.controller.user;
 
 import jakarta.servlet.ServletException;
 
@@ -37,12 +37,10 @@ public class UserUpdateController extends HttpServlet {
 		if (success) {
 			request.setAttribute("status", "updated");
 
-			request.getRequestDispatcher("/WEB-INF/Pages/userProfilePage.jsp").forward(request, response);
-
 		} else {
 			request.setAttribute("status", "failed");
-			request.getRequestDispatcher("WEB-INF/Pages/userProfilePage.jsp").forward(request, response);
 		}
+		request.getRequestDispatcher("WEB-INF/Pages/userProfilePage.jsp").forward(request, response);
 
 	}
 

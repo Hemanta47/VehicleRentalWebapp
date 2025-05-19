@@ -12,11 +12,12 @@ public class CartModel {
     private Date startDate;
     private Date endDate;
     private String pickupLocation;
+    private String dropupLocation;
 
     public CartModel() {
     }
 
-    public CartModel(int vehicleId, String brand, String model, String imageUrl, BigDecimal dailyRate, Date startDate, Date endDate, String pickupLocation) {
+    public CartModel(int vehicleId, String brand, String model, String imageUrl, BigDecimal dailyRate, Date startDate, Date endDate, String pickupLocation, String dropupLocation) {
         this.vehicleId = vehicleId;
         this.brand = brand;
         this.model = model;
@@ -25,6 +26,7 @@ public class CartModel {
         this.startDate = startDate;
         this.endDate = endDate;
         this.pickupLocation = pickupLocation;
+        this.dropupLocation = dropupLocation;
     }
 
     public int getVehicleId() {
@@ -100,4 +102,12 @@ public class CartModel {
         BigDecimal rentalDays = new BigDecimal(getRentalDays());
         return dailyRate.multiply(rentalDays);  // Return total price as BigDecimal
     }
+
+	public String getDropupLocation() {
+		return dropupLocation;
+	}
+
+	public void setDropupLocationString(String dropupLocation) {
+		this.dropupLocation = dropupLocation;
+	}
 }

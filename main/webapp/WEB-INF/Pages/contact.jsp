@@ -51,8 +51,7 @@
 					<h2>Get in touch</h2>
 					<p class="form-desc">Have questions, suggestions, or need
 						support? Drop us a message and we’ll get back to you soon!</p>
-					<form action="https://formspree.io/f/xjvowzqk" method="POST">
-						<input type="text" name="name" placeholder="Name" required>
+					<form action="${contextPath}/contact" method="POST">
 						<input type="email" name="email" placeholder="Email" required>
 						<input type="text" name="subject" placeholder="Subject" required>
 						<textarea name="message" placeholder="Message..." required></textarea>

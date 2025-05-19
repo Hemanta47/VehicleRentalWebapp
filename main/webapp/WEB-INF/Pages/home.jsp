@@ -156,8 +156,18 @@
 									</p>
 								</div>
 								<div>
-									<a href="${contextPath}/vehicleDetail?vehicleId=${vehicle.id}">View
-										Details</a>
+									<c:choose>
+										<c:when test="${not empty sessionScope.username}">
+											<a
+												href="${contextPath}/vehicleDetail?vehicleId=${vehicle.id}">View
+												Details</a>
+										</c:when>
+										<c:otherwise>
+											<a
+												href="${contextPath}/login">View
+												Details</a>
+										</c:otherwise>
+									</c:choose>
 								</div>
 							</div>
 						</div>

@@ -1,4 +1,4 @@
-package com.FleetX.controller;
+package com.FleetX.controller.user;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -16,7 +16,7 @@ import com.FleetX.service.UserService;
 @WebServlet(asyncSupported = true, urlPatterns = { "/userprofile" })
 public class UserProfileController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
+     
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -25,7 +25,6 @@ public class UserProfileController extends HttpServlet {
 	    String username = (String) request.getSession().getAttribute("username");
 
 	    if (username == null) {
-	        // Redirect to login if no username is found in session
 	        response.sendRedirect(request.getContextPath() + "/login");
 	        return;
 	    }
@@ -40,6 +39,7 @@ public class UserProfileController extends HttpServlet {
 	    }
 
 	    request.setAttribute("user", user);
+	    request.setAttribute("rentList", userService.getRentalData(username));
 	    request.getRequestDispatcher("WEB-INF/Pages/userProfilePage.jsp").forward(request, response);
 	}
 
