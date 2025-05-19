@@ -74,10 +74,9 @@ public class AddVehicleController extends HttpServlet {
             boolean success = vehicleService.insertVehicle(vehicle);
 
             if (success) {
-                System.out.println("Vehicle added successfully!");
+            	request.getSession().setAttribute("message", "Vehicle addition successful.");
             } else {
-                request.setAttribute("error", "Failed to add vehicle.");
-                System.err.println("Vehicle addition failed.");
+                request.getSession().setAttribute("message", "Failed to add vehicle.");
             }
 
             // Redirect to dashboard in both cases

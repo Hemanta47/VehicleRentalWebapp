@@ -21,6 +21,11 @@ public class MessageModel {
         this.content = content;
         this.sentAt = sentAt;
     }
+    
+    public MessageModel(String content, Timestamp sentAt) {
+        this.content = content;
+        this.sentAt = sentAt;
+    }
 
     // Getters and Setters
     public int getMessageId() {

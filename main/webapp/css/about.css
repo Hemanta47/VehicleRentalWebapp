@@ -71,7 +71,7 @@ body {
 
 .team-list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 30px;
     padding: 0;
     list-style: none;
@@ -81,14 +81,14 @@ body {
     background-color: #ffffff;
     border-radius: 16px;
     box-shadow: 0 0px 10px rgba(0, 0, 0, 0.6);
-    padding: 25px;
+    padding: 25px 20px;
     transition: all 0.3s ease;
-    text-align: center;
     display: flex;
     flex-direction: column;
-    gap: 10px;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    text-align: center;
+    gap: 10px;
 }
 
 .team-member:hover {
@@ -101,39 +101,83 @@ body {
     height: 120px;
     border-radius: 50%;
     object-fit: cover;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
-
 
 .personal-info .name {
     font-size: 1.2rem;
     font-weight: 600;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
     color: #101e27;
 }
 
 .personal-info .role {
     font-style: italic;
     color: var(--gray-700);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .personal-info .bio {
     color: #555;
     font-size: 0.95rem;
     line-height: 1.5;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.4s ease;
+    margin-top: 0;
 }
 
-.team-member a{
+.personal-info .bio.show {
+    max-height: 500px;
+    opacity: 1;
+    margin-top: 10px;
+}
+
+.toggle-btn {
     border: 2px solid var(--gray-700);
     color: var(--black);
     border-radius: 25px;
     padding: .5rem 1rem;
     transition: .3s all ease;
+    background: transparent;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 0.9rem;
 }
 
-.team-member a:hover{
+.toggle-btn:hover {
     background: var(--black);
     color: var(--white);
 }
+
+.toggle-btn i {
+    transition: transform 0.3s ease;
+}
+
+/* Optional: rotate chevron when open */
+.personal-info .bio.show + .toggle-btn i.fa-chevron-down {
+    transform: rotate(180deg);
+}
+
+.bio {
+    max-height: 100px;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.bio.show {
+    max-height: 1000px;
+}
+
+.toggle-btn {
+    background: none;
+    border: none;
+    margin-top: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #333;
+    transition: transform 0.3s ease;
+}
+

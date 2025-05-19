@@ -25,6 +25,14 @@
 		<div class="hero">
 			<h1>Contact Us</h1>
 		</div>
+		<c:if test="${not empty sessionScope.messageStatus}">
+			<div class="popup" id="popup">
+				<p>${sessionScope.messageStatus}</p>
+				<button id="closePopup">Ok</button>
+			</div>
+			<c:remove var="messageStatus" scope="session" />
+		</c:if>
+
 		<div class="contact-content">
 			<div class="first-section">
 				<div class="first-one">
@@ -51,7 +59,7 @@
 					<h2>Get in touch</h2>
 					<p class="form-desc">Have questions, suggestions, or need
 						support? Drop us a message and we’ll get back to you soon!</p>
-					<form action="${contextPath}/contact" method="POST">
+					<form action="${contextPath}/SendMessage" method="POST">
 						<input type="email" name="email" placeholder="Email" required>
 						<input type="text" name="subject" placeholder="Subject" required>
 						<textarea name="message" placeholder="Message..." required></textarea>
@@ -62,11 +70,12 @@
 			<div class="last-section">
 				<iframe
 					src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3531.8387442068183!2d85.29312007492355!3d27.722264724834368!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMjfCsDQzJzIwLjEiTiA4NcKwMTcnNDQuNSJF!5e0!3m2!1sen!2snp!4v1744859594468!5m2!1sen!2snp"
-					width="600" height="450" style="border: 0;" allowfullscreen=""
-					loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+					width="600" height="450" style="border: 0;"></iframe>
 			</div>
 		</div>
 	</div>
 	<jsp:include page="./component/footer.jsp" />
 </body>
+<script type="text/javascript" src="${contextPath}/js/popUp.js"></script>
+
 </html>

@@ -1,4 +1,4 @@
-package com.FleetX.controller.vehicle;
+package com.FleetX.controller.admin;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -34,12 +34,11 @@ public class DeleteVehicleController extends HttpServlet {
         boolean isDeleted = vehicleService.deleteVehicle(Integer.parseInt(id));
 
         if (isDeleted) {
-            System.out.println("Vehicle deleted successfully.");
-            response.sendRedirect("Dashboard");
+        	request.getSession().setAttribute("message", "Vehicle Deleted Successfully.");
         } else {
-            System.out.println("Failed to delete vehicle.");
-            response.sendRedirect("Dashboard");
+        	request.getSession().setAttribute("message", "Failed to delete vehicle.");
         }
+		response.sendRedirect("Dashboard");
 
 	}
 

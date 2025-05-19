@@ -44,6 +44,7 @@ public class Dashboard extends HttpServlet {
 			request.setAttribute("totalUser", userService.totalUserCount());
 			
 			request.setAttribute("MessageList", contactService.getAllMessages());
+			request.setAttribute("Only5Message", contactService.getOnly5Messages());
 			request.setAttribute("totalMessage", contactService.totalMessageCount());
 			
 			request.setAttribute("BookingList", checkoutService.getAllRental());

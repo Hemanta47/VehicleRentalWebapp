@@ -24,14 +24,14 @@
 
 		<div class="vehicle-content">
 			<!-- Display Success Message when Added to Cart -->
-			<c:if test="${not empty sessionScope.cartMessage}">
-				<div class="alert" id="cartMessage" style="">${sessionScope.cartMessage}</div>
-				<c:remove var="cartMessage" scope="session" />
+			<c:if test="${not empty sessionScope.messageStatus}">
+				<div class="popup" id="popup">
+					<p>${sessionScope.messageStatus}</p>
+					<button id="closePopup">Ok</button>
+				</div>
+				<c:remove var="messageStatus" scope="session" />
 			</c:if>
 
-			<c:if test="${not empty requestScope.message}">
-				<div class="alert" id="message">${requestScope.message}</div>
-			</c:if>
 
 			<section class="one">
 				<h2>Browse Your Vehicle</h2>
@@ -136,15 +136,5 @@
 
 	<jsp:include page="./component/footer.jsp" />
 </body>
-<script>
-  window.addEventListener('DOMContentLoaded', () => {
-    const alert = document.getElementById('cartMessage')|| document.getElementById('message');
-    if (alert) {
-      setTimeout(() => {
-        alert.classList.add('hide');
-      }, 4000);
-    }
-  });
-</script>
-
+<script type="text/javascript" src="${contextPath}/js/popUp.js"></script>
 </html>

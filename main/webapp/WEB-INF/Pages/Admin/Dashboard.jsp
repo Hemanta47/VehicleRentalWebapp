@@ -72,7 +72,13 @@
 
 		<!-- Dashboard Section -->
 		<section id="dashboard" class="main active-main">
-
+			<c:if test="${not empty sessionScope.message}">
+				<div class="popup" id="popup">
+					<p>${sessionScope.message}</p>
+					<button id="closePopup">Ok</button>
+				</div>
+				<c:remove var="message" scope="session" />
+			</c:if>
 			<div class="welcome-section">
 				<h2 class="welcome-title">Welcome, Admin!</h2>
 				<p class="welcome-subtitle">Manage your vehicle fleet
@@ -178,7 +184,7 @@
 							</tr>
 						</thead>
 						<tbody>
-							<c:forEach var="msg" items="${MessageList}">
+							<c:forEach var="msg" items="${Only5Message}">
 								<tr>
 									<td>${msg.content}</td>
 									<td>${msg.sentAt}</td>
@@ -227,7 +233,7 @@
 									<td>V${vehicle.id}</td>
 									<td>
 										<div>
-											<strong>${vehicle.brand}${vehicle.model}</strong>
+											<strong>${vehicle.brand} ${vehicle.model}</strong>
 											<div style="font-size: 0.8rem; color: var(--text-secondary);">2020</div>
 										</div>
 									</td>
@@ -238,8 +244,8 @@
 									<td>${vehicle.transmission}</td>
 									<td>${vehicle.capacity}</td>
 									<td><img alt="${vehicle.model}"
-										src="${contextPath}/assets/vehicle/${vehicle.imageUrl}" width="80"
-										height="50" style="object-fit: cover;"></td>
+										src="${contextPath}/assets/vehicle/${vehicle.imageUrl}"
+										width="80" height="50" style="object-fit: cover;"></td>
 									<td><span class="status status-available">${vehicle.status}</span></td>
 									<td>${vehicle.location}</td>
 									<td>
@@ -541,5 +547,6 @@
 
 </body>
 <script type="text/javascript" src="${contextPath}/js/adminSection.js"></script>
+<script type="text/javascript" src="${contextPath}/js/popUp.js"></script>
 </html>
 

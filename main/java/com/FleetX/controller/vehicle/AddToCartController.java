@@ -21,53 +21,47 @@ import com.FleetX.service.VehicleService;
 @WebServlet(asyncSupported = true, urlPatterns = { "/AddToCart" })
 public class AddToCartController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	  private VehicleService vehicleService;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public AddToCartController() {
-    	vehicleService = new VehicleService();
-    }
+	private VehicleService vehicleService;
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#HttpServlet()
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int vehicleId = Integer.parseInt(request.getParameter("vehicleId"));
-        Date startDate = Date.valueOf(request.getParameter("startDate"));
-        Date endDate = Date.valueOf(request.getParameter("endDate"));
-        String pickupLocation = request.getParameter("pickupLocation");
-        String dropupLocation = request.getParameter("dropupLocation");
-        
-        VehicleModel vehicle = vehicleService.getVehicleById(vehicleId);
-        if (vehicle == null) {
-            response.sendRedirect("vehicle"); 
-            return;
-        }
-        
-        CartModel cart = new CartModel(
-        		vehicle.getId(),
-        	    vehicle.getBrand(),
-        	    vehicle.getModel(),
-        	    vehicle.getImageUrl(),
-        	    vehicle.getDailyRate(),
-        	    startDate,
-        	    endDate,
-        	    pickupLocation,
-        	    dropupLocation);
-        
-        HttpSession session = request.getSession();
-        CartService service = new CartService(session);
-        boolean added = service.addItem(cart);
-
-        if (!added) {
-            session.setAttribute("cartMessage", "Vehicle already in cart!");
-        } else {
-            session.setAttribute("cartMessage", "Vehicle added to cart successfully.");
-        }
-
-        response.sendRedirect("vehicle");
+	public AddToCartController() {
+		vehicleService = new VehicleService();
 	}
 
-} 
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		int vehicleId = Integer.parseInt(request.getParameter("vehicleId"));
+		Date startDate = Date.valueOf(request.getParameter("startDate"));
+		Date endDate = Date.valueOf(request.getParameter("endDate"));
+		String pickupLocation = request.getParameter("pickupLocation");
+		String dropupLocation = request.getParameter("dropupLocation");
+
+		VehicleModel vehicle = vehicleService.getVehicleById(vehicleId);
+		if (vehicle == null) {
+			response.sendRedirect("vehicle");
+			return;
+		}
+
+		CartModel cart = new CartModel(vehicle.getId(), vehicle.getBrand(), vehicle.getModel(), vehicle.getImageUrl(),
+				vehicle.getDailyRate(), startDate, endDate, pickupLocation, dropupLocation);
+
+		HttpSession session = request.getSession();
+		CartService service = new CartService(session);
+		boolean added = service.addItem(cart);
+
+		if (!added) {
+			request.getSession().setAttribute("messageStatus", "Vehicle already in cart!");
+		} else {
+			request.getSession().setAttribute("messageStatus", "Vehicle added to cart successfully.");
+		}
+
+		response.sendRedirect("vehicle");
+	}
+
+}

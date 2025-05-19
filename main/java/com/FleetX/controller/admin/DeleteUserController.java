@@ -13,27 +13,28 @@ import jakarta.servlet.http.HttpServletResponse;
 @SuppressWarnings("serial")
 @WebServlet("/deleteUser")
 public class DeleteUserController extends HttpServlet {
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String userId = request.getParameter("userId");
-        System.out.println("User ID to delete: " + userId);  // Debugging line
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		String userId = request.getParameter("userId");
+		System.out.println("User ID to delete: " + userId); // Debugging line
 
-        UserService userService = new UserService();
-        
-        // If userId is null or empty, handle it as an error
-        if (userId == null || userId.isEmpty()) {
-            System.out.println("No user ID provided.");
-            response.sendRedirect("Dashboard");
-            return;
-        }
+		UserService userService = new UserService();
 
-        boolean isDeleted = userService.deleteUser(Integer.parseInt(userId));
+		// If userId is null or empty, handle it as an error
+		if (userId == null || userId.isEmpty()) {
+			System.out.println("No user ID provided.");
+			response.sendRedirect("Dashboard");
+			return;
+		}
 
-        if (isDeleted) {
-            System.out.println("User deleted successfully.");
-            response.sendRedirect("Dashboard");
-        } else {
-            System.out.println("Failed to delete user.");
-            response.sendRedirect("Dashboard");
-        }
-    }
+		boolean isDeleted = userService.deleteUser(Integer.parseInt(userId));
+
+		if (isDeleted) {
+			request.getSession().setAttribute("message", "User deleted successfully.");
+		} else {
+			request.getSession().setAttribute("message", "Failed to delete user.");
+		}
+		response.sendRedirect("Dashboard");
+
+	}
 }

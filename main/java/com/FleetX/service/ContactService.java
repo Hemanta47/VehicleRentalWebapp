@@ -65,9 +65,8 @@ public class ContactService {
 	public List<MessageModel> getAllMessages() {
 		List<MessageModel> messages = new ArrayList<>();
 
-		String sql = "SELECT m.message_id, m.subject, m.content, m.sent_at, u.email " +
-		             "FROM message m JOIN users u ON m.user_id = u.UserID " +
-		             "ORDER BY m.sent_at DESC";
+		String sql = "SELECT m.message_id, m.subject, m.content, m.sent_at, u.email "
+				+ "FROM message m JOIN users u ON m.user_id = u.UserID " + "ORDER BY m.sent_at DESC";
 
 		try (PreparedStatement stmt = dConnection.prepareStatement(sql)) {
 			ResultSet rs = stmt.executeQuery();
@@ -87,7 +86,7 @@ public class ContactService {
 
 		return messages;
 	}
-	
+
 	public int totalMessageCount() {
 		int count = 0;
 		String sqlString = "SELECT COUNT(*) FROM message";
@@ -102,4 +101,25 @@ public class ContactService {
 		}
 		return count;
 	}
+
+	public List<MessageModel> getOnly5Messages() {
+		List<MessageModel> messages = new ArrayList<>();
+
+		String sql = "SELECT content, sent_at FROM message ORDER BY sent_at DESC LIMIT 5";
+
+		try (PreparedStatement stmt = dConnection.prepareStatement(sql)) {
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				MessageModel message = new MessageModel();
+				message.setContent(rs.getString("content"));
+				message.setSentAt(rs.getTimestamp("sent_at"));
+				messages.add(message);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return messages;
+	}
+
 }

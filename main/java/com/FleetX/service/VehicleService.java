@@ -231,12 +231,8 @@ public class VehicleService {
 
 		try (PreparedStatement ps1 = dbConnection.prepareStatement(updateRentalSql);
 				PreparedStatement ps2 = dbConnection.prepareStatement(updateVehicleSql)) {
-			int rentalUpdated = ps1.executeUpdate();
-			int vehicleUpdated = ps2.executeUpdate();
-
-			System.out.println(" Updated " + rentalUpdated + " rental(s) to 'completed'.");
-			System.out.println(" Updated " + vehicleUpdated + " vehicle(s) to 'available' and updated their location.");
-
+			ps1.executeUpdate();
+			ps2.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

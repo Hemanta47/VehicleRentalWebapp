@@ -1,4 +1,4 @@
-package com.FleetX.controller;
+package com.FleetX.controller.vehicle;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -131,14 +131,12 @@ public class ProcessOrderController extends HttpServlet {
 		}
 
 		if (allSuccess) {
-			System.out.println("Order placed successfully!");
 			httpRequest.setAttribute("cartSize", 0);
 			cartService.clearCart();
-			request.getSession().setAttribute("message", "Order placed successfully!");
+			request.getSession().setAttribute("messageStatus", "Order placed successfully!");
 			response.sendRedirect("vehicle");
 		} else {
-			System.out.println("Something went wrong while processing your order.");
-			request.setAttribute("error", "Something went wrong while processing your order.");
+			request.getSession().setAttribute("messageStatus", "Something went wrong while processing your order.");
 			request.getRequestDispatcher("/WEB-INF/Pages/checkout.jsp").forward(request, response);
 		}
 

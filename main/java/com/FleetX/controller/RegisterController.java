@@ -78,56 +78,63 @@ public class RegisterController extends HttpServlet {
 	}
 
 	private String validateRegistrationForm(HttpServletRequest request) {
-		// Retrieve form data
-		String fname = request.getParameter("fname");
-		String lname = request.getParameter("lname");
-		String uname = request.getParameter("username");
-		String dob = request.getParameter("dob");
-		String email = request.getParameter("email");
-		String phone = request.getParameter("phone");
-		String password = request.getParameter("password");
-		String repassword = request.getParameter("repassword");
+	    // Retrieve form data
+	    String fname = request.getParameter("fname");
+	    String lname = request.getParameter("lname");
+	    String uname = request.getParameter("username");
+	    String dob = request.getParameter("dob");
+	    String email = request.getParameter("email");
+	    String phone = request.getParameter("phone");
+	    String password = request.getParameter("password");
+	    String repassword = request.getParameter("repassword");
 
-		if (ValidationUtil.isNullOrEmpty(fname))
-			return "First name is empty";
-		if (ValidationUtil.isNullOrEmpty(lname))
-			return "Last name is empty";
-		if (ValidationUtil.isNullOrEmpty(uname))
-			return "Username is empty";
-		if (ValidationUtil.isNullOrEmpty(dob))
-			return "Dob is empty";
-		if (ValidationUtil.isNullOrEmpty(email))
-			return "Email is empty";
-		if (ValidationUtil.isNullOrEmpty(phone))
-			return "Phone number is empty";
-		if (ValidationUtil.isNullOrEmpty(password))
-			return "Password is empty";
-		if (ValidationUtil.isNullOrEmpty(repassword))
-			return "Please retype the password";
+	    // Validate fields
+	    if (ValidationUtil.isNullOrEmpty(fname))
+	        return "First name is empty";
+	    if (!ValidationUtil.isAlphabetic(fname))
+	        return "First name must contain only letters";
 
-		LocalDate dobDate = null;
-		try {
-			dobDate = LocalDate.parse(dob);
-		} catch (Exception e) {
-			return "Invalid date format for DOB";
-		}
+	    if (ValidationUtil.isNullOrEmpty(lname))
+	        return "Last name is empty";
+	    if (!ValidationUtil.isAlphabetic(lname))
+	        return "Last name must contain only letters";
 
-		if (!ValidationUtil.isAlphabetic(fname))
-			return "Name should be letter only";
-		if (!ValidationUtil.isAlphabetic(lname))
-			return "Name should be letter only";
-		if (!ValidationUtil.isAlphanumericStartingWithLetter(uname))
-			return "Username must start with letter and contains number or letter";
-		if (!ValidationUtil.isAgeAtLeast21(dobDate))
-			return "User age must be 18 or more";
-		if (!ValidationUtil.isValidEmail(email))
-			return "Invalid email format";
-		if (!ValidationUtil.isValidPhoneNumber(phone))
-			return "Phone number should start with 98 and be 10 digiit";
-		if (!ValidationUtil.doPasswordsMatch(password, repassword))
-			return "Passwords do not match";
+	    if (ValidationUtil.isNullOrEmpty(uname))
+	        return "Username is empty";
+	    if (!ValidationUtil.isAlphanumericStartingWithLetter(uname))
+	        return "Username must start with a letter and contain only letters and numbers";
 
-		return null;
+	    if (ValidationUtil.isNullOrEmpty(dob))
+	        return "Date of birth is empty";
+	    
+	    LocalDate dobDate = null;
+	    try {
+	        dobDate = LocalDate.parse(dob);
+	    } catch (Exception e) {
+	        return "Invalid date format for DOB";
+	    }
+
+	    if (!ValidationUtil.isAgeAtLeast21(dobDate))
+	        return "User age must be 18 or more";
+
+	    if (ValidationUtil.isNullOrEmpty(email))
+	        return "Email is empty";
+	    if (!ValidationUtil.isValidEmail(email))
+	        return "Invalid email format";
+
+	    if (ValidationUtil.isNullOrEmpty(phone))
+	        return "Phone number is empty";
+	    if (!ValidationUtil.isValidPhoneNumber(phone))
+	        return "Phone number must start with 98 and be 10 digits";
+
+	    if (ValidationUtil.isNullOrEmpty(password))
+	        return "Password is empty";
+	    if (ValidationUtil.isNullOrEmpty(repassword))
+	        return "Please retype the password";
+	    if (!ValidationUtil.doPasswordsMatch(password, repassword))
+	        return "Passwords do not match";
+
+	    return null;
 	}
 
 }
