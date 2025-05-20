@@ -32,6 +32,7 @@
 							<a href="${contextPath}/vehicle" class="slide-btn">Browse
 								Vehicle</a>
 						</c:when>
+						
 						<c:otherwise>
 							<a href="${contextPath}/login" class="slide-btn">Sign Up</a>
 						</c:otherwise>

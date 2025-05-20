@@ -1,6 +1,5 @@
 .vehicle-form-container {
 	padding: 2rem;
-	background: var(--light);
 	border-radius: var(--radius);
 	box-shadow: var(--shadow);
 }

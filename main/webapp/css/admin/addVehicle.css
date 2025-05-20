@@ -79,7 +79,7 @@
 
 .form-body {
 	padding: 2rem;
-	background: var(--gray-300);
+	background: var(--gray-700);
 }
 
 form {
@@ -96,7 +96,7 @@ form {
 
 .section-title {
 	font-size: 1.1rem;
-	color: var(--primary);
+	color: #fff;
 	margin-bottom: 1rem;
 	font-weight: 600;
 }

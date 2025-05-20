@@ -30,7 +30,7 @@ body {
 	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 	margin: 0;
 	padding: 0;
-	background-color: #f1f3f5;
+	background-color: #696f74;
 	color: var(--text-primary);
 }
 
@@ -55,7 +55,6 @@ body {
 
 .form-header h3 {
 	font-size: 2rem;
-	color: var(--primary-dark);
 }
 
 .form-body form {
@@ -75,7 +74,7 @@ body {
 	font-size: 1.25rem;
 	font-weight: 600;
 	margin-bottom: 1rem;
-	color: var(--primary);
+	color: var(--text-secondary);
 }
 
 .form-row {
@@ -151,7 +150,7 @@ small {
 }
 
 .back a {
-	background: var(--primary);
+	background: var(--text-primary);
 	color: var(--white);
 	text-decoration: none;
 	padding: .5rem 1rem;

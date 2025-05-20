@@ -465,7 +465,9 @@
 
 		<!-- Users -->
 		<section id="user" class="main">
-			<h2 class="page-title">Manage Users</h2>
+		<div class="content-header">
+					<h2 class="section-title">Users</h2>
+				</div>
 			<table class="data-table">
 				<thead>
 					<tr>
@@ -513,6 +515,9 @@
 
 		<!-- Messages -->
 		<section id="messageContent" class="main">
+		<div class="content-header">
+					<h2 class="section-title">Messages</h2>
+				</div>
 			<table class="data-table">
 				<thead>
 					<tr>
