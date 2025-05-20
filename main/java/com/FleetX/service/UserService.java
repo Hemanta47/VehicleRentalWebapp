@@ -12,9 +12,17 @@ import com.FleetX.model.RentalModel;
 import com.FleetX.model.UserModel;
 import com.FleetX.util.PasswordUtil;
 
+/**
+ * Service class for managing user-related operations in the FleetX application.
+ * Handles database operations for user management including CRUD operations.
+ */
 public class UserService {
+	// Database connection instance
 	private Connection dbConnection;
 
+	/**
+	 * Constructor - initializes the database connection
+	 */
 	public UserService() {
 		try {
 			this.dbConnection = DbConfig.getDbConnection();
@@ -24,6 +32,12 @@ public class UserService {
 		}
 	}
 
+	/**
+	 * Retrieves a user's ID by their username
+	 * 
+	 * @param username The username to search for
+	 * @return The user ID if found, 0 otherwise
+	 */
 	public int getUserIdByUsername(String username) {
 		int userId = 0;
 		String sqlString = "SELECT UserID from users WHERE username = ?";
@@ -40,6 +54,11 @@ public class UserService {
 
 	}
 
+	/**
+	 * Retrieves all users with the role of "customer"
+	 * 
+	 * @return List of UserModel objects
+	 */
 	public List<UserModel> getAllUser() {
 		String role = "customer";
 		List<UserModel> usersList = new ArrayList<>();
@@ -60,6 +79,12 @@ public class UserService {
 		return usersList;
 	}
 
+	/**
+	 * Helper method to create a UserModel object from database result set
+	 * 
+	 * @param rs ResultSet containing user data
+	 * @return Populated UserModel object
+	 */
 	public UserModel addUserDetail(ResultSet rs) {
 		UserModel userModel = new UserModel();
 
@@ -80,6 +105,12 @@ public class UserService {
 		return userModel;
 	}
 
+	/**
+	 * Retrieves a user by their username
+	 * 
+	 * @param username The username to search for
+	 * @return UserModel if found, null otherwise
+	 */
 	public UserModel getUserByUsername(String username) {
 		UserModel user = null;
 		String sqlString = "SELECT * FROM users WHERE Username = ?";
@@ -104,6 +135,12 @@ public class UserService {
 		return user;
 	}
 
+	/**
+	 * Updates a user's profile information
+	 * 
+	 * @param user UserModel containing updated information
+	 * @return true if update successful, false otherwise
+	 */
 	public boolean updateUserProfile(UserModel user) {
 		String sql = "UPDATE users SET FirstName=?, LastName=?, Email=?, Number=? WHERE UserName=?";
 
@@ -122,6 +159,14 @@ public class UserService {
 		}
 	}
 
+	/**
+	 * Updates a user's password after verifying the old password
+	 * 
+	 * @param uName       The username
+	 * @param oldPassword Current password
+	 * @param newPassword New password to set
+	 * @return true if update successful, false otherwise
+	 */
 	public boolean updateUserPassword(String uName, String oldPassword, String newPassword) {
 		String sqlSelect = "SELECT Password FROM users WHERE UserName = ?";
 		String sqlUpdate = "UPDATE users SET Password = ? WHERE UserName = ?";
@@ -129,6 +174,7 @@ public class UserService {
 		try (PreparedStatement pst = dbConnection.prepareStatement(sqlSelect);
 				PreparedStatement pstUpdate = dbConnection.prepareStatement(sqlUpdate)) {
 
+			// First verify the old password
 			pst.setString(1, uName);
 			ResultSet rSet = pst.executeQuery();
 
@@ -143,6 +189,7 @@ public class UserService {
 				return false;
 			}
 
+			// Then update with the new password
 			String newHashPassword = PasswordUtil.encrypt(uName, newPassword);
 			pstUpdate.setString(1, newHashPassword);
 			pstUpdate.setString(2, uName);
@@ -156,6 +203,13 @@ public class UserService {
 		}
 	}
 
+	/**
+	 * Gets a username by email address
+	 * 
+	 * @param email The email to search for
+	 * @return Username if found, null otherwise
+	 * @throws SQLException if database error occurs
+	 */
 	public String getUsernameByEmail(String email) throws SQLException {
 		String sql = "SELECT Username FROM users WHERE Email = ?";
 		try (PreparedStatement pst = dbConnection.prepareStatement(sql)) {
@@ -173,6 +227,14 @@ public class UserService {
 		}
 	}
 
+	/**
+	 * Updates a user's password using their email address
+	 * Used for password reset functionality
+	 * 
+	 * @param email             The user's email
+	 * @param encryptedPassword The new encrypted password
+	 * @return true if update successful, false otherwise
+	 */
 	public boolean updateUserPasswordByEmail(String email, String encryptedPassword) {
 		String sql = "UPDATE users SET Password = ? WHERE Email = ?";
 		try (PreparedStatement pst = dbConnection.prepareStatement(sql)) {
@@ -186,6 +248,12 @@ public class UserService {
 		}
 	}
 
+	/**
+	 * Deletes a user from the database
+	 * 
+	 * @param userId ID of the user to delete
+	 * @return true if deletion successful, false otherwise
+	 */
 	public boolean deleteUser(int userId) {
 		String query = "DELETE FROM users WHERE UserID = ?";
 		try (PreparedStatement stmt = dbConnection.prepareStatement(query)) {
@@ -198,6 +266,12 @@ public class UserService {
 		}
 	}
 
+	/**
+	 * Retrieves rental data for a specific user
+	 * 
+	 * @param username The username to get rentals for
+	 * @return List of RentalModel objects
+	 */
 	public List<RentalModel> getRentalData(String username) {
 		List<RentalModel> rentList = new ArrayList<>();
 		String sqlString = """
@@ -236,6 +310,11 @@ public class UserService {
 		return rentList;
 	}
 
+	/**
+	 * Counts the total number of users in the database
+	 * 
+	 * @return Total count of users
+	 */
 	public int totalUserCount() {
 		int count = 0;
 		String sqlString = "SELECT COUNT(*) FROM users";
@@ -252,6 +331,11 @@ public class UserService {
 		return count;
 	}
 
+	/**
+	 * Gets the 5 most recently added customers
+	 * 
+	 * @return List of up to 5 UserModel objects
+	 */
 	public List<UserModel> getOnly5User() {
 		String role = "customer";
 		List<UserModel> usersList = new ArrayList<>();
