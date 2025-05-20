@@ -2,11 +2,9 @@ package com.FleetX.controller.admin;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-
 import com.FleetX.model.VehicleModel;
 import com.FleetX.service.VehicleService;
 import com.FleetX.util.ImageUtil;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,6 +13,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 
+/**
+ * Controller for adding new vehicles to the system
+ * Handles processing of form data and image uploads for new vehicles
+ */
 @SuppressWarnings("serial")
 @WebServlet("/AddVehicle")
 @MultipartConfig(
@@ -23,18 +25,24 @@ import jakarta.servlet.http.Part;
     maxRequestSize = 1024 * 1024 * 50     // 50MB
 )
 public class AddVehicleController extends HttpServlet {
-
+    // Service to handle database operations for vehicles
     private VehicleService vehicleService;
 
+    /**
+     * Initialize the controller by creating a VehicleService instance
+     */
     @Override
     public void init() {
         vehicleService = new VehicleService();
     }
 
+    /**
+     * Process POST requests containing vehicle form data
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        // Set character encoding to handle non-ASCII characters
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
 
@@ -72,7 +80,6 @@ public class AddVehicleController extends HttpServlet {
 
             // === Store vehicle in database ===
             boolean success = vehicleService.insertVehicle(vehicle);
-
             if (success) {
             	request.getSession().setAttribute("message", "Vehicle addition successful.");
             } else {
@@ -81,8 +88,8 @@ public class AddVehicleController extends HttpServlet {
 
             // Redirect to dashboard in both cases
             response.sendRedirect(request.getContextPath() + "/Dashboard");
-
         } catch (Exception e) {
+            // Log and handle any exceptions that occur during processing
             e.printStackTrace();
             request.setAttribute("error", "Unexpected error occurred: " + e.getMessage());
             response.sendRedirect(request.getContextPath() + "/Dashboard");
