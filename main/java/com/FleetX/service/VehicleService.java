@@ -7,9 +7,17 @@ import java.util.List;
 import com.FleetX.config.DbConfig;
 import com.FleetX.model.VehicleModel;
 
+/**
+ * Service class for managing vehicle-related operations in the FleetX application.
+ * Handles database operations for vehicle management including CRUD operations.
+ */
 public class VehicleService {
+	// Database connection instance
 	private Connection dbConnection;
 
+	/**
+	 * Constructor - initializes the database connection
+	 */
 	public VehicleService() {
 		try {
 			this.dbConnection = DbConfig.getDbConnection();
@@ -19,13 +27,19 @@ public class VehicleService {
 		}
 	}
 
+	/**
+	 * Inserts a new vehicle into the database
+	 * 
+	 * @param vehicle The VehicleModel object containing vehicle details
+	 * @return true if insertion successful, false otherwise
+	 */
 	public boolean insertVehicle(VehicleModel vehicle) {
 		String sql = "INSERT INTO vehicle (" + "category, brand, model, year, registration_number, "
 				+ "daily_rate, fuel_type, transmission, capacity, status, "
 				+ "image_url, location, description, features" + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 		try (PreparedStatement stmt = dbConnection.prepareStatement(sql)) {
-
+			// Set all parameters for the prepared statement
 			stmt.setString(1, vehicle.getCategory());
 			stmt.setString(2, vehicle.getBrand());
 			stmt.setString(3, vehicle.getModel());
@@ -50,9 +64,12 @@ public class VehicleService {
 		}
 	}
 
-	// Get all vehicles
+	/**
+	 * Retrieves all vehicles from the database
+	 * 
+	 * @return List of VehicleModel objects
+	 */
 	public List<VehicleModel> getAllVehicles() {
-
 		List<VehicleModel> vehicles = new ArrayList<>();
 		String sql = "SELECT * FROM vehicle ORDER BY id DESC";
 
@@ -66,12 +83,21 @@ public class VehicleService {
 		return vehicles;
 	}
 
-	// Filtering Vehicle
+	/**
+	 * Retrieves vehicles filtered by various criteria
+	 * 
+	 * @param fuel     Fuel type filter
+	 * @param gear     Transmission type filter
+	 * @param type     Vehicle category filter
+	 * @param location Vehicle location filter
+	 * @return List of filtered VehicleModel objects
+	 */
 	public List<VehicleModel> getFilteredVehicles(String fuel, String gear, String type, String location) {
 		List<VehicleModel> vehicles = new ArrayList<>();
 		StringBuilder sql = new StringBuilder("SELECT * FROM vehicle WHERE 1=1");
 		List<Object> params = new ArrayList<>();
 
+		// Dynamically build the query based on the provided filters
 		if (fuel != null && !fuel.isEmpty()) {
 			sql.append(" AND fuel_type = ?");
 			params.add(fuel);
@@ -90,6 +116,7 @@ public class VehicleService {
 		}
 
 		try (PreparedStatement stmt = dbConnection.prepareStatement(sql.toString())) {
+			// Set all parameters for the prepared statement
 			for (int i = 0; i < params.size(); i++) {
 				stmt.setObject(i + 1, params.get(i));
 			}
@@ -106,6 +133,12 @@ public class VehicleService {
 		return vehicles;
 	}
 
+	/**
+	 * Retrieves a vehicle by its ID
+	 * 
+	 * @param id The vehicle ID to search for
+	 * @return VehicleModel if found, null otherwise
+	 */
 	public VehicleModel getVehicleById(int id) {
 		VehicleModel vehicle = null;
 		String sql = "SELECT * FROM vehicle WHERE id = ?";
@@ -113,7 +146,7 @@ public class VehicleService {
 			stmt.setInt(1, id);
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next()) {
-				vehicle = setVehicleResult(rs); // use your helper
+				vehicle = setVehicleResult(rs); // Use helper method
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -121,6 +154,13 @@ public class VehicleService {
 		return vehicle;
 	}
 
+	/**
+	 * Helper method to create a VehicleModel object from database result set
+	 * 
+	 * @param rs ResultSet containing vehicle data
+	 * @return Populated VehicleModel object
+	 * @throws SQLException if database error occurs
+	 */
 	public VehicleModel setVehicleResult(ResultSet rs) throws SQLException {
 		VehicleModel v = new VehicleModel();
 		v.setId(rs.getInt("id"));
@@ -141,12 +181,18 @@ public class VehicleService {
 		return v;
 	}
 
+	/**
+	 * Retrieves the 4 most recently added available vehicles
+	 * 
+	 * @return List of up to 4 VehicleModel objects
+	 */
 	public List<VehicleModel> getNewAddedVehicle() {
 		List<VehicleModel> vehicles = new ArrayList<>();
 		String sql = "SELECT * FROM vehicle WHERE status='available' ORDER BY id DESC LIMIT 4";
 
 		try (PreparedStatement stmt = dbConnection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 			while (rs.next()) {
+				// Create a simplified VehicleModel with only necessary fields
 				vehicles.add(new VehicleModel(rs.getInt("id"), rs.getString("brand"), rs.getString("model"),
 						rs.getBigDecimal("daily_rate"), rs.getString("transmission"), rs.getInt("capacity"),
 						rs.getString("image_url")));
@@ -159,13 +205,19 @@ public class VehicleService {
 
 	}
 
+	/**
+	 * Updates an existing vehicle in the database
+	 * 
+	 * @param vehicle The VehicleModel object containing updated details
+	 * @return true if update successful, false otherwise
+	 */
 	public boolean updateVehicle(VehicleModel vehicle) {
 		String sql = "UPDATE vehicle SET category=?, brand=?, model=?, year=?, registration_number=?, "
 				+ "daily_rate=?, fuel_type=?, transmission=?, capacity=?, status=?, image_url=?, "
 				+ "location=?, description=?, features=? WHERE id=?";
 
 		try (PreparedStatement stmt = dbConnection.prepareStatement(sql)) {
-
+			// Set all parameters for the prepared statement
 			stmt.setString(1, vehicle.getCategory());
 			stmt.setString(2, vehicle.getBrand());
 			stmt.setString(3, vehicle.getModel());
@@ -192,6 +244,12 @@ public class VehicleService {
 		}
 	}
 
+	/**
+	 * Deletes a vehicle from the database
+	 * 
+	 * @param vehicleId ID of the vehicle to delete
+	 * @return true if deletion successful, false otherwise
+	 */
 	public boolean deleteVehicle(int vehicleId) {
 		String query = "DELETE FROM vehicle WHERE id = ?";
 		try (PreparedStatement stmt = dbConnection.prepareStatement(query)) {
@@ -204,13 +262,19 @@ public class VehicleService {
 		}
 	}
 
+	/**
+	 * Updates vehicle availability status based on rental end dates
+	 * Marks rentals as 'completed' when end date is reached and updates vehicle status to 'available'
+	 */
 	public void updateVehicleAvailabilityBasedOnRentals() {
+		// First update rentals to 'completed' status when end date is reached
 		String updateRentalSql = """
 				    UPDATE rental
 				    SET status = 'completed'
 				    WHERE end_date <= CURRENT_DATE AND status = 'booked'
 				""";
 
+		// Then update vehicle status and location based on completed rentals
 		String updateVehicleSql = """
 				    UPDATE vehicle
 				    SET status = 'available', location = (
@@ -238,6 +302,11 @@ public class VehicleService {
 		}
 	}
 
+	/**
+	 * Counts the total number of vehicles in the database
+	 * 
+	 * @return Total count of vehicles
+	 */
 	public int totalVehicleCount() {
 		int count = 0;
 		String sqlString = "SELECT COUNT(*) FROM vehicle";
