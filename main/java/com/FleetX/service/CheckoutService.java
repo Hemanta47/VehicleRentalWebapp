@@ -13,9 +13,18 @@ import com.FleetX.model.RentalModel;
 import com.FleetX.model.BookingTrendModel;
 import com.FleetX.model.PaymentModel;
 
+/**
+ * Service class that handles checkout operations in the FleetX application.
+ * Manages rental bookings, payments, and provides analytics for booking trends.
+ * Interacts with the database to persist and retrieve rental and payment information.
+ */
 public class CheckoutService {
 	private Connection dbConnection;
 
+	/**
+	 * Constructor that initializes the database connection.
+	 * Uses DbConfig to establish a connection to the database.
+	 */
 	public CheckoutService() {
 		try {
 			dbConnection = DbConfig.getDbConnection();
@@ -24,6 +33,14 @@ public class CheckoutService {
 		}
 	}
 
+	/**
+	 * Inserts a new rental record into the database.
+	 * Sets the initial status of the rental to 'booked'.
+	 * 
+	 * @param rentalModel The rental data to be inserted
+	 * @return The generated rental ID if successful
+	 * @throws SQLException If a database error occurs
+	 */
 	public int insertRental(RentalModel rentalModel) throws SQLException {
 		String sql = "INSERT INTO rental (user_id, vehicle_id, start_date, end_date, address, dropLocation, status) VALUES (?, ?, ?, ?, ?, ?, 'booked')";
 		try (PreparedStatement pst = dbConnection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -51,6 +68,13 @@ public class CheckoutService {
 		}
 	}
 
+	/**
+	 * Records a payment for a rental in the database.
+	 * 
+	 * @param paymentModel The payment data to be inserted
+	 * @return true if payment was successfully inserted, false otherwise
+	 * @throws SQLException If a database error occurs
+	 */
 	public boolean insertPayment(PaymentModel paymentModel) throws SQLException {
 		String sql = "INSERT INTO payment (rental_id, amount, payment_date) VALUES (?, ?, ?)";
 		try (PreparedStatement pst = dbConnection.prepareStatement(sql)) {
@@ -66,6 +90,12 @@ public class CheckoutService {
 		}
 	}
 
+	/**
+	 * Retrieves all rental records from the database with their payment information.
+	 * Uses a left join to include rentals that may not have payments yet.
+	 * 
+	 * @return List of rental models, ordered by rental ID in descending order
+	 */
 	public List<RentalModel> getAllRental() {
 		List<RentalModel> rentalList = new ArrayList<>();
 		
@@ -88,6 +118,13 @@ public class CheckoutService {
 		return rentalList;
 	}
 
+	/**
+	 * Helper method to convert a result set row to a RentalModel object.
+	 * Extracts all fields from the database and constructs a RentalModel instance.
+	 * 
+	 * @param rs The result set containing rental data
+	 * @return A populated RentalModel object
+	 */
 	public RentalModel addRentalDetail(ResultSet rs) {
 		try {
 			return new RentalModel(
@@ -107,6 +144,15 @@ public class CheckoutService {
 		}
 	}
 	
+	/**
+	 * Updates the status of a vehicle in the database.
+	 * Used to mark vehicles as booked, available, etc.
+	 * 
+	 * @param vehicleId The ID of the vehicle to update
+	 * @param status The new status value
+	 * @return true if update was successful, false otherwise
+	 * @throws SQLException If a database error occurs
+	 */
 	public boolean updateVehicleStatus(int vehicleId, String status) throws SQLException {
 	    String sql = "UPDATE vehicle SET status = ? WHERE id = ?";
 	    try (PreparedStatement stmt = dbConnection.prepareStatement(sql)) {
@@ -117,6 +163,12 @@ public class CheckoutService {
 	    }
 	}
 	
+	/**
+	 * Counts the total number of bookings in the system.
+	 * Used for dashboard statistics.
+	 * 
+	 * @return Total count of rental records
+	 */
 	public int totalBookingCount() {
 		int count = 0;
 		String sqlString = "SELECT COUNT(*) FROM rental";
@@ -132,6 +184,13 @@ public class CheckoutService {
 		return count;
 	}
 	
+	/**
+	 * Retrieves booking trend data for the last 7 days.
+	 * Groups bookings by date and counts the total for each day.
+	 * Used for dashboard analytics and reporting.
+	 * 
+	 * @return List of booking trend models with date and count information
+	 */
 	public List<BookingTrendModel> getBookingTrend() {
 		List<BookingTrendModel> trendList = new ArrayList<>();
 		String sql = """
@@ -157,6 +216,4 @@ public class CheckoutService {
 		}
 		return trendList;
 	}
-
-
 }
