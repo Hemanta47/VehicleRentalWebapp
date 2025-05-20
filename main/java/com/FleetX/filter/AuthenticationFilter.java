@@ -15,6 +15,11 @@ import java.io.IOException;
 import com.FleetX.util.CookieUtil;
 import com.FleetX.util.SessionUtil;
 
+/**
+ * Authentication and authorization filter for the FleetX application.
+ * Controls access to different parts of the application based on user roles.
+ * Handles routing logic for admins, customers, and unauthenticated users.
+ */
 @SuppressWarnings("serial")
 @WebFilter("/AuthenticationFilter")
 public class AuthenticationFilter extends HttpFilter implements Filter {
@@ -38,16 +43,37 @@ public class AuthenticationFilter extends HttpFilter implements Filter {
     private static final String USER_PROFILE = "/userprofile";
     private static final String CONTACT = "/contact";
 
+    /**
+     * Called when the filter is destroyed.
+     * Not used in this implementation.
+     */
     @Override
     public void destroy() {
         // Not used
     }
 
+    /**
+     * Called when the filter is initialized.
+     * Not used in this implementation.
+     * 
+     * @param fConfig Filter configuration
+     * @throws ServletException If a servlet error occurs
+     */
     @Override
     public void init(FilterConfig fConfig) throws ServletException {
         // Not used
     }
 
+    /**
+     * Main filter method that handles request authentication and authorization.
+     * Implements role-based access control for the application.
+     * 
+     * @param request The servlet request
+     * @param response The servlet response
+     * @param chain The filter chain for invoking the next filter or resource
+     * @throws IOException If an I/O error occurs
+     * @throws ServletException If a servlet error occurs
+     */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
