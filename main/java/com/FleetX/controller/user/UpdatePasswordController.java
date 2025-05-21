@@ -18,35 +18,36 @@ import com.FleetX.service.UserService;
  */
 @WebServlet(asyncSupported = true, urlPatterns = { "/updatePassword" })
 public class UpdatePasswordController extends HttpServlet {
-    private static final long serialVersionUID = 1L;
-    private final UserService userService = new UserService();
+	private static final long serialVersionUID = 1L;
+	private final UserService userService = new UserService();
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String uName = request.getParameter("username");
-        String oldPassword = request.getParameter("oldPassword");
-        String newPassword = request.getParameter("newPassword");
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+	        throws ServletException, IOException {
 
-        if (uName == null || oldPassword == null || newPassword == null ||
-            uName.isEmpty() || oldPassword.isEmpty() || newPassword.isEmpty()) {
-            request.setAttribute("error", "All fields are required.");
-            request.getRequestDispatcher("/WEB-INF/Pages/userProfilePage.jsp").forward(request, response);
-            return;
-        }
+	    String uName = request.getParameter("username");
+	    String oldPassword = request.getParameter("oldPassword");
+	    String newPassword = request.getParameter("newPassword");
 
-        boolean success = userService.updateUserPassword(uName, oldPassword, newPassword);
-        HttpSession session = request.getSession();
+	    if (uName == null || oldPassword == null || newPassword == null ||
+	        uName.isEmpty() || oldPassword.isEmpty() || newPassword.isEmpty()) {
+	        request.setAttribute("error", "All fields are required.");
+	        request.getRequestDispatcher("/WEB-INF/Pages/userProfilePage.jsp").forward(request, response);
+	        return;
+	    }
 
-        if (success) {
-            request.setAttribute("passwordStatus", "success"); 
-            session.setAttribute("passwordUpdatedAt", new Date());
-        } else {
-            request.setAttribute("error", "Failed to update password. Check old password.");
-        }
+	    boolean success = userService.updateUserPassword(uName, oldPassword, newPassword);
 
-        // Always update user model in session
-        UserModel updatedUser = userService.getUserByUsername(uName);
-        session.setAttribute("user", updatedUser);
-
-        request.getRequestDispatcher("/WEB-INF/Pages/userProfilePage.jsp").forward(request, response);
-    }
+	    if (success) {
+	        // Invalidate session for security and redirect to login
+	        request.getSession().invalidate();
+	        response.sendRedirect("login");
+	        return;
+	    } else {
+	        // Show failure message and forward to profile page
+	        request.setAttribute("passwordStatus", "Failed to update password. Check old password.");
+	        request.getRequestDispatcher("/WEB-INF/Pages/userProfilePage.jsp").forward(request, response);
+	        return;
+	    }
+	}
+	
 }

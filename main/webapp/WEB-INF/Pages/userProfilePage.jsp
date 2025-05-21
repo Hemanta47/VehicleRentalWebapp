@@ -56,9 +56,9 @@
 					</div>
 				</c:if>
 
-				<c:if test="${passwordStatus == 'success'}">
+				<c:if test="${not empty passwordStatus}">
 					<div id="popup" class="popup">
-						Password successfully updated!
+					     ${passwordStatus}
 						<button onclick="closePopup('popup')">OK</button>
 					</div>
 				</c:if>
